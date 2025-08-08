@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="mn">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Oyunsanaa – 30 чат Hub</title>
+  <style>
+    :root{ --brand:#7F4B30; --ink:#222; --bg:#fff; --muted:#f4f2ef; --chip:#e9ddd2; }
+    *{box-sizing:border-box}
+    body{margin:0;font-family:system-ui,-apple-system,Segoe UI,Arial;color:var(--ink);background:var(--bg)}
+    header{position:sticky;top:0;background:var(--brand);color:#fff;padding:12px 14px;z-index:10}
+    header h1{margin:0;font-size:16px;line-height:1}
+    .tabs{display:flex;gap:8px;flex-wrap:wrap;margin:10px 0 0}
+    .tab-btn{appearance:none;border:0;border-radius:999px;padding:8px 12px;background:rgba(255,255,255,.18);color:#fff;font-weight:600;cursor:pointer}
+    .tab-btn.active{background:#fff;color:#000}
+    main{padding:14px}
+    .note{background:var(--muted);padding:10px 12px;border-radius:10px;font-size:14px;margin-bottom:12px}
+    .grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px}
+    @media(min-width:480px){ .grid{grid-template-columns:repeat(3,1fr)} }
+    a.btn{
+      display:block;text-decoration:none;padding:12px;border-radius:10px;
+      background:var(--chip); color:#000; font-weight:600; text-align:left;
+      border:1px solid #e1d5c8;
+    }
+    a.btn:hover{filter:brightness(.98)}
+    .hidden{display:none}
+    footer{padding:14px 14px 24px;color:#666;font-size:12px;text-align:center}
+    .pill{display:inline-block;border-radius:999px;background:#0000000f;padding:2px 8px;margin-left:6px;font-size:12px}
+  </style>
+</head>
+<body>
+  <header>
+    <h1>Oyunsanaa • Чатны төв <span class="pill" id="pillCount">30 чат</span></h1>
+    <div class="tabs">
+      <button class="tab-btn" data-tab="premium">⭐ Премиум</button>
+      <button class="tab-btn" data-tab="engiin">🟣 Энгийн</button>
+      <button class="tab-btn" data-tab="bagts">🟤 Багц</button>
+      <button class="tab-btn" data-tab="tusgai">🟠 Тусгай хэрэгцээт</button>
+    </div>
+  </header>
+
+  <main>
+    <div class="note">Доорх товчнууд дээр дармагц тухайн чат энэ цонхон дотор нээгдэнэ. URL-уудыг өөрийн бодит чат хуудаснуудаар <strong>солихоо мартуузай</strong>.</div>
+
+    <!-- ⭐ Премиум: 8 чат -->
+    <section id="panel-premium" class="grid">
+      <a class="btn" href="/chat/premium-1">1. Премиум – Харилцан ярилцлага</a>
+      <a class="btn" href="/chat/premium-2">2. Премиум – Төлөвлөгөө</a>
+      <a class="btn" href="/chat/premium-3">3. Премиум – Сэтгэл засал</a>
+      <a class="btn" href="/chat/premium-4">4. Премиум – Асуудал шийдвэрлэлт</a>
+      <a class="btn" href="/chat/premium-5">5. Премиум – Өдөр тутам</a>
+      <a class="btn" href="/chat/premium-6">6. Премиум – Урам зориг</a>
+      <a class="btn" href="/chat/premium-7">7. Премиум – Өөрийгөө танин мэд</a>
+      <a class="btn" href="/chat/premium-8">8. Премиум – Өөрийн туслалцаа</a>
+    </section>
+
+    <!-- 🟣 Энгийн: 8 чат -->
+    <section id="panel-engiin" class="grid hidden">
+      <a class="btn" href="/chat/engiin-1">1. Энгийн – Танилцах</a>
+      <a class="btn" href="/chat/engiin-2">2. Энгийн – Сонсогч</a>
+      <a class="btn" href="/chat/engiin-3">3. Энгийн – Богино зөвлөгөө</a>
+      <a class="btn" href="/chat/engiin-4">4. Энгийн – Сэтгэл тайвшруулах</a>
+      <a class="btn" href="/chat/engiin-5">5. Энгийн – Өдрийн асуулт</a>
+      <a class="btn" href="/chat/engiin-6">6. Энгийн – Дасгал</a>
+      <a class="btn" href="/chat/engiin-7">7. Энгийн – Сэдэвчилсэн</a>
+      <a class="btn" href="/chat/engiin-8">8. Энгийн – Шуурхай</a>
+    </section>
+
+    <!-- 🟤 Багц: 5 чат -->
+    <section id="panel-bagts" class="grid hidden">
+      <a class="btn" href="/chat/bagts-1">1. Гэр бүл</a>
+      <a class="btn" href="/chat/bagts-2">2. Харилцаа</a>
+      <a class="btn" href="/chat/bagts-3">3. Ажил & карьер</a>
+      <a class="btn" href="/chat/bagts-4">4. Санхүү</a>
+      <a class="btn" href="/chat/bagts-5">5. Эрүүл мэнд</a>
+    </section>
+
+    <!-- 🟠 Тусгай хэрэгцээт: 4 чат -->
+    <section id="panel-tusgai" class="grid hidden">
+      <a class="btn" href="/chat/tusgai-1">1. Харааны бэрхшээлтэй – Премиум</a>
+      <a class="btn" href="/chat/tusgai-2">2. Харааны бэрхшээлтэй – Энгийн</a>
+      <a class="btn" href="/chat/tusgai-3">3. Тусгай хэрэгцээт – Премиум</a>
+      <a class="btn" href="/chat/tusgai-4">4. Тусгай хэрэгцээт – Энгийн</a>
+    </section>
+  </main>
+
+  <footer>
+    © Oyunsanaa • Энэ хуудсыг iframe дотор ачаалж байгаа бол буцаж ирэхдээ “Буцах” товч ашиглана уу.
+  </footer>
+
+  <script>
+    // --- Tabs + URL параметрээр section сонгох ---
+    const TABS = ["premium","engiin","bagts","tusgai"];
+    const qs = new URLSearchParams(location.search);
+    const initial = (qs.get("section")||"premium").toLowerCase();
+    const switchTo = (name) => {
+      TABS.forEach(key=>{
+        document.querySelector(`[data-tab="${key}"]`)?.classList.toggle('active', key===name);
+        document.getElementById(`panel-${key}`)?.classList.toggle('hidden', key!==name);
+      });
+    };
+    document.querySelectorAll('.tab-btn').forEach(b=>{
+      b.addEventListener('click', ()=> switchTo(b.dataset.tab));
+    });
+    switchTo(TABS.includes(initial)?initial:"premium");
+
+    // Жишээ тоолуур (дээрх pill)
+    document.getElementById('pillCount').textContent = "30 чат";
+  </script>
+</body>
+</html>
