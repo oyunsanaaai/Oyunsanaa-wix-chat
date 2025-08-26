@@ -1,0 +1,118 @@
+:root{
+  --brand:#7D8769; /* ерөнхий ногоон */
+  --bg:#fff; --text:#222; --muted:#8a8a8a; --line:#e9e9ee;
+  --user:#E8F0E9; --bot:#fff; --shadow:0 10px 30px rgba(0,0,0,.12);
+  --font-ui: Roboto, -apple-system, "Segoe UI", Arial, sans-serif;
+  --t-base:14px; --line-compact:1.25;
+  --icon-header:#CFE0C9; --icon-menu:#6F8B62;
+}
+
+/* FAB */
+.oy-fab{position:fixed;z-index:9998;border:none;border-radius:999px;padding:10px 20px;
+  font:600 14px/1.2 var(--font-ui);cursor:pointer;box-shadow:0 4px 10px rgba(0,0,0,.2);
+  bottom:20px;right:20px;transition:.25s}
+.oy-fab-primary{background:#800000;color:#fff}
+.oy-fab-secondary{background:var(--brand);color:#fff;bottom:70px}
+@media (max-width:520px){.oy-fab{bottom:14px;right:14px}.oy-fab-secondary{bottom:60px}}
+
+/* Overlay + Modal */
+.oy-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999}
+.oy-modal{position:fixed;z-index:10000;right:16px;bottom:82px;width:100%;max-width:420px;height:80vh;max-height:720px;
+  background:#fff;border-radius:20px;box-shadow:var(--shadow);display:flex;flex-direction:column;overflow:hidden}
+@media (max-width:520px){.oy-modal{right:0;left:0;bottom:0;width:100%;height:100vh;border-radius:0}}
+[hidden]{display:none!important}
+
+/* Header */
+.oy-header{position:sticky;top:0;height:52px;background:var(--brand);color:#fff;display:flex;align-items:center;z-index:2}
+.oy-iconbtn{background:transparent;border:none;color:#fff;cursor:pointer;width:44px;height:44px;display:grid;place-items:center}
+.oy-iconbtn svg{width:18px;height:18px}
+#btnDrawer,#btnClose{color:var(--icon-header)}
+.oy-title{flex:1;text-align:center;font:400 var(--t-base)/1.2 var(--font-ui);padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Drawer */
+.oy-drawer{position:absolute;inset:0 auto 0 0;width:84%;max-width:320px;background:#fff;border-right:1px solid var(--line);
+  transform:translateX(-102%);transition:transform .25s ease;display:flex;flex-direction:column;z-index:3}
+.oy-drawer.open{transform:translateX(0)}
+.oy-menu{flex:1;overflow:auto;padding:8px;-webkit-overflow-scrolling:touch}
+.oy-card{border:1px solid var(--line);border-radius:12px;padding:10px;background:#fff;margin:6px 4px}
+.kv{font:500 13px var(--font-ui);margin:4px 0}
+
+/* Menu items */
+.oy-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;cursor:pointer;border:1px solid var(--line);background:#fff;margin:6px 4px}
+.oy-item:hover{background:#f9f9fb}
+.oy-item .i{width:18px;height:18px;flex:0 0 18px;display:grid;place-items:center;color:var(--icon-menu)}
+.oy-item .i svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.oy-item .t{flex:1;font:400 var(--t-base)/var(--line-compact) var(--font-ui)}
+.oy-section{margin:10px 6px}
+.oy-section h4{margin:10px 6px 6px;font:700 13px var(--font-ui)}
+
+/* Guides */
+.guides-heading{margin:12px 8px 6px;font:700 13px/1.2 var(--font-ui);color:#173125}
+.oy-pills{display:flex;flex-direction:column;gap:8px}
+.oy-pill{--c:#eee;--tc:#111;background:var(--c);color:var(--tc);border-radius:16px;padding:12px 14px;border:1px solid rgba(0,0,0,.06);
+  cursor:pointer;display:flex;justify-content:space-between;align-items:center;font:600 13px var(--font-ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+/* Active chats */
+#activeList .item{display:flex;align-items:center;gap:8px;border:1px solid var(--line);border-radius:12px;padding:8px 10px;margin:6px 4px;background:#fff}
+#activeList .dot{width:12px;height:12px;border-radius:999px;flex:0 0 12px}
+#activeList .name{flex:1;cursor:pointer;font:400 var(--t-base)/var(--line-compact) var(--font-ui);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+#activeList button{border:none;background:#eee;border-radius:8px;padding:2px 8px;cursor:pointer}
+
+/* Panel */
+.oy-panel{position:absolute;inset:0;background:#fff;border-left:1px solid var(--line);display:flex;flex-direction:column;z-index:4}
+.oy-panel header{height:44px;display:flex;align-items:center;gap:10px;padding:0 8px;border-bottom:1px solid var(--line);background:#fafafa}
+.oy-back{border:1px solid var(--line);background:#fff;border-radius:10px;padding:6px 10px;cursor:pointer}
+.oy-panel-title{font:600 14px var(--font-ui)}
+.oy-panel-body{padding:10px;overflow:auto}
+.card{border:1px solid var(--line);border-radius:12px;padding:10px;margin:8px 0;background:#fff}
+.muted{color:#777;font:12px/1.4 var(--font-ui)}
+
+/* Chat */
+.oy-chat{position:relative;flex:1;background:#fafafa;overflow:auto}
+.oy-stream{padding:12px 12px 100px;max-width:720px;margin:0 auto}
+.oy-bubble{max-width:84%;padding:10px 12px;border-radius:20px;margin:6px 0;font:14px/1.45 var(--font-ui);box-shadow:0 13px 28px rgba(0,0,0,.10)}
+.oy-bot{background:var(--bot);border:1px solid var(--line);border-top-left-radius:6px}
+.oy-user{background:var(--user);border:1px solid var(--line);border-top-right-radius:6px;margin-left:auto}
+.oy-meta{color:var(--muted);font:11px var(--font-ui);margin:2px 0 0}
+
+/* Composer */
+.oy-composer{position:absolute;left:0;right:0;bottom:0;background:#fff;border-top:1px solid var(--line)}
+.oy-row{display:grid;grid-template-columns:28px 1fr 72px;gap:8px;padding:8px;align-items:center}
+.oy-file{width:20px;height:20px;display:grid;place-items:center;border:1px dashed var(--line);border-radius:14px;background:#fff;cursor:pointer;color:var(--brand)}
+.oy-textarea{min-height:42px;max-height:120px;resize:none;border:1px solid var(--line);border-radius:16px;padding:10px 12px;font:14px/1.35 var(--font-ui);outline:none;background:#fdfdfd}
+.oy-send{height:40px;border:none;background:var(--brand);color:#fff;border-radius:14px;padding:0 14px;cursor:pointer}
+
+/* A11y */
+.braille{position:absolute;left:-999em;top:auto;width:1px;height:1px;overflow:hidden}
+body{margin:0;background:#fff;color:var(--text)}
+/* Header иконы өнгийг var(--icon-header) болгоно */
+#btnDrawer, #btnClose { color: var(--icon-header); }
+
+/* ☰ — дүүрэн (fill) зургаар */
+#btnDrawer svg path { fill: currentColor; stroke: none; }
+
+/* ✕ — зураас (stroke) зургаар */
+#btnClose  svg path {
+  stroke: currentColor; fill: none; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
