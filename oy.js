@@ -204,13 +204,38 @@
     const k=msgKey(key); const arr=JSON.parse(localStorage.getItem(k)||'[]');
     arr.push({t:Date.now(), who, html}); localStorage.setItem(k, JSON.stringify(arr));
   }
-  async function send(){
-    const t=(el.input?.value||'').trim(); if(!t){ meta('Жишээ: “Сайн байна уу?”'); return; }
-    if(!state.current){ bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
-    bubble(esc(t),'user'); pushMsg(state.current,'user',esc(t)); el.input.value='';
-    setTimeout(()=>{ const r='Таныг сонсож байна. Ний нуугүй сэтгэлээсээ ярилцъя. 💬';
-      bubble(r,'bot'); pushMsg(state.current,'bot',r); save(); },150);
+  // --- CHAT илгээх (жинхэнэ API хувилбар) ---
+const OY_API_BASE = "https://oyunsanaa-wix-chat.vercel.app"; // өөрийн Vercel домэйноо тавь
+
+async function send() {
+  const t = (el.input?.value || "").trim();
+  if (!t) { meta('Жишээ: “Сайн байна уу?”'); return; }
+  if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿', 'bot'); el.input.value = ''; return; }
+
+  // UI дээр хэрэглэгчийн мессежийг харуулж, талбар хоослох
+  bubble(esc(t), 'user');
+  pushMsg(state.current, 'user', esc(t));
+  el.input.value = '';
+  el.send.disabled = true;
+
+  try {
+    const r = await fetch(`${OY_API_BASE}/api/oy-chat`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ message: t })
+    });
+
+    const data = await r.json();
+    const reply = esc(data.reply || 'Одоохондоо хариу олдсонгүй.');
+    bubble(reply, 'bot');
+    pushMsg(state.current, 'bot', reply);
+    save();
+  } catch (err) {
+    bubble('⚠️ Холболтын алдаа. Дахин оролдоно уу.', 'bot');
+  } finally {
+    el.send.disabled = false;
   }
+}
 
   /* ===== Modal / Drawer ===== */
   function openModal(){
