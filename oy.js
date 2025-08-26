@@ -4,7 +4,6 @@
 
   /* ===== Элементүүд ===== */
   const el = {
-    open1: $('#oyOpen1'), open2: $('#oyOpen2'),
     overlay: $('#oyOverlay'), modal: $('#oyModal'),
     drawer: $('#oyDrawer'), menu: $('.oy-menu'),
     menuList: $('#menuList'),
@@ -264,8 +263,6 @@ async function send() {
   }
 
   /* ===== Events ===== */
-  el.open1?.addEventListener('click', openModal);
-  el.open2?.addEventListener('click', openModal);
   el.overlay?.addEventListener('click', closeModal);
   el.btnClose?.addEventListener('click', closeModal);
   el.btnDrawer?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); el.guidesWrap.hidden=true; toggleDrawer(); });
