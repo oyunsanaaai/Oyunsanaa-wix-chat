@@ -6,12 +6,6 @@
   --t-base:14px; --line-compact:1.25;
   --icon-header:#CFE0C9; --icon-menu:#6F8B62;
 }
-.oy-fab {
-  position: fixed;
-  bottom: 20px;
-  right: 20px;
-  z-index: 999999;
-}
 /* Overlay + Modal */
 .oy-overlay{position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:9999}
 .oy-modal{position:fixed;z-index:10000;right:16px;bottom:82px;width:100%;max-width:420px;height:80vh;max-height:720px;
