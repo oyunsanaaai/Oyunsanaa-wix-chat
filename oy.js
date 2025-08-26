@@ -1,9 +1,18 @@
+/* =========================================================
+   OYUNSANAA CHAT — FULL oy.js (Wix/Embed-д бэлэн)
+   ========================================================= */
 (()=> {
   if (window.__OY_BOOTED__) return; window.__OY_BOOTED__ = true;
   const $ = (s, r=document) => r.querySelector(s);
 
-  /* ===== Элементүүд ===== */
+  /* ---------- CONFIG ---------- */
+  // ВЕРСЕЛ домэйнээ энд тавина:
+  const OY_API_BASE = "https://oyunsanaa-wix-chat.vercel.app"; // << өөрийн домэйн
+  const OY_API_PATH = "/api/oy-chat"; // << өөр бол солино
+
+  /* ---------- ЭЛЕМЕНТҮҮД ---------- */
   const el = {
+    open1: $('#oyOpen1'), open2: $('#oyOpen2'),
     overlay: $('#oyOverlay'), modal: $('#oyModal'),
     drawer: $('#oyDrawer'), menu: $('.oy-menu'),
     menuList: $('#menuList'),
@@ -20,7 +29,7 @@
     file: $('#oyFile'),
   };
 
-  /* ===== Data ===== */
+  /* ---------- DATA ---------- */
   const AGE = [
     {slug:'age-0-7',  name:'Бага балчир үе (0–7)',           color:'#E1D9C9'},
     {slug:'age-8-12', name:'Адтай бяцхан үе (8–12)',         color:'#AE9372'},
@@ -36,13 +45,13 @@
     {slug:'special', name:'Тусгай хэрэгцээт',     color:'#897E45'},
   ];
 
-  /* ===== Store ===== */
+  /* ---------- STORE ---------- */
   const LSKEY='oy_state_v9'; const msgKey = k=>'oy_msgs_'+k;
   let state = { account:{name:'Хэрэглэгч', code:'OY-0000'}, current:null, active:{} };
   try { const s=JSON.parse(localStorage.getItem(LSKEY)||'null'); if(s) state={...state,...s}; } catch(_){}
   const save = () => localStorage.setItem(LSKEY, JSON.stringify(state));
 
-  /* ===== Helpers ===== */
+  /* ---------- HELPERS ---------- */
   const textColorFor=(hex)=>{ const c=(hex||'').replace('#',''); if(c.length<6) return '#111';
     const r=parseInt(c.slice(0,2),16), g=parseInt(c.slice(2,4),16), b=parseInt(c.slice(4,6),16);
     const L=(0.299*r+0.587*g+0.114*b)/255; return L>0.7? '#111':'#fff'; };
@@ -51,7 +60,7 @@
     el.stream.appendChild(d); el.chat.scrollTop=el.chat.scrollHeight; return d; }
   function meta(t){ const m=document.createElement('div'); m.className='oy-meta'; m.textContent=t; el.stream.appendChild(m); }
 
-  /* ===== Icons ===== */
+  /* ---------- ICONS ---------- */
   const ICONS = {
     user:'<circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6"></path>',
     chart:'<path d="M4 20V10"></path><path d="M10 20V4"></path><path d="M16 20v-7"></path><path d="M2 20h20"></path>',
@@ -65,7 +74,7 @@
   };
   const iconSvg = (name)=>`<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]||ICONS.user}</svg>`;
 
-  /* ===== Panels ===== */
+  /* ---------- PANELS ---------- */
   const Panels = {
     registry:{
       account:{ title:'Миний бүртгэл', render:(w)=>{ w.innerHTML=`
@@ -107,20 +116,14 @@
       $('#oyPanelBack').onclick = () => { $('#oyPanel').hidden = true; };
     }
   };
-
-  /* ===== 4 slug-ийн alias (даралтад ажиллах) ===== */
-  Panels.registry['daily_tasks'] = {
-    title: 'Өдрийн даалгавар',
-    render: (w) => { w.innerHTML = `
-      <div class="card"><b>Өнөөдрийн зорилт</b>
-        <div class="muted">Жагсаалтыг дараа бодит болгоно.</div>
-      </div>`; }
-  };
+  // alias-ууд
+  Panels.registry['daily_tasks'] = { title:'Өдрийн даалгавар', render:(w)=>{ w.innerHTML=`
+    <div class="card"><b>Өнөөдрийн зорилт</b><div class="muted">Жагсаалтыг дараа бодит болгоно.</div></div>` } };
   Panels.registry['journal_book'] = Panels.registry.journal;
   Panels.registry['psy_edu']      = Panels.registry.edu;
   Panels.registry['diet_fitness'] = Panels.registry.health;
 
-  /* ===== Меню (9 ширхэг) ===== */
+  /* ---------- МЕНЮ (9 ширхэг) ---------- */
   const MENU_ITEMS = [
     {key:'account',   title:'Миний бүртгэл',        icon:'user'},
     {key:'summary',   title:'Таны сонголт',         icon:'chart'},
@@ -148,7 +151,7 @@
     });
   }
 
-  /* ===== Guides ===== */
+  /* ---------- GUIDES ---------- */
   function renderAgeCats(){
     el.guideCatsAge.innerHTML='';
     AGE.forEach(it=>{
@@ -191,11 +194,11 @@
     });
   }
 
-  /* ===== Chat ===== */
+  /* ---------- CHAT ---------- */
   function loadChat(key,greet){
     el.stream.innerHTML='';
     const raw=localStorage.getItem(msgKey(key));
-    if(raw){ try{ (JSON.parse(raw)||[]).forEach(m=>bubble(m.html,m.who)); }catch(_){ /* ignore */ } }
+    if(raw){ try{ (JSON.parse(raw)||[]).forEach(m=>bubble(m.html,m.who)); }catch(_){ } }
     else if(greet){ bubble('Сайн уу. Чат эхэллээ. 🌿','bot'); meta('Тавтай морилно уу'); }
     setTimeout(()=>el.input && el.input.focus(),30);
   }
@@ -203,42 +206,53 @@
     const k=msgKey(key); const arr=JSON.parse(localStorage.getItem(k)||'[]');
     arr.push({t:Date.now(), who, html}); localStorage.setItem(k, JSON.stringify(arr));
   }
-  // --- CHAT илгээх (жинхэнэ API хувилбар) ---
-const API_URL = "https://oyunsanaa-wix-chat.vercel.app/api/chat";
-async function send() {
-  const t = (el.input?.value || "").trim();
-  if (!t) { meta('Жишээ: “Сайн байна уу?”'); return; }
-  if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿', 'bot'); el.input.value = ''; return; }
+  const lastHistory = (key, n=10)=>{
+    const k=msgKey(key); try{ const arr=JSON.parse(localStorage.getItem(k)||'[]'); return arr.slice(-n); }catch(_){ return []; }
+  };
 
-  // UI дээр хэрэглэгчийн мессежийг харуулж, талбар хоослох
-  bubble(esc(t), 'user');
-  pushMsg(state.current, 'user', esc(t));
-  el.input.value = '';
-  el.send.disabled = true;
+  async function send(){
+    const t=(el.input?.value||'').trim();
+    if(!t){ meta('Жишээ: “Сайн байна уу?”'); return; }
+    if(!state.current){ bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
 
-  try {
-    const r = await fetch(`${OY_API_BASE}/api/oy-chat`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ message: t })
-    });
+    bubble(esc(t),'user'); pushMsg(state.current,'user',esc(t)); el.input.value=''; el.send.disabled=true;
 
-    const data = await r.json();
-    const reply = esc(data.reply || 'Одоохондоо хариу олдсонгүй.');
-    bubble(reply, 'bot');
-    pushMsg(state.current, 'bot', reply);
-    save();
-  } catch (err) {
-    bubble('⚠️ Холболтын алдаа. Дахин оролдоно уу.', 'bot');
-  } finally {
-    el.send.disabled = false;
+    // API дуудлага
+    try{
+      const controller = new AbortController(); const id = setTimeout(()=>controller.abort(), 45000);
+      const r = await fetch((OY_API_BASE.replace(/\/$/,'')+OY_API_PATH), {
+        method:'POST',
+        headers:{ 'Content-Type':'application/json' },
+        body: JSON.stringify({
+          msg: t,
+          chatSlug: state.current || 'default',
+          history: lastHistory(state.current, 10) // [{t, who, html}]
+        }),
+        signal: controller.signal
+      });
+      clearTimeout(id);
+
+      if(!r.ok){
+        const txt = await r.text().catch(()=>String(r.status));
+        bubble('⚠️ Алдаа ('+r.status+'): '+esc(txt), 'bot');
+        el.send.disabled=false; return;
+      }
+
+      const data = await r.json();
+      const reply = esc(data?.reply || 'Ойлголоо. 🌿');
+      bubble(reply,'bot'); pushMsg(state.current,'bot',reply); save();
+    }catch(err){
+      bubble('⚠️ Холболтын алдаа. Сүлжээгээ шалгаад дахин оролдоно уу.', 'bot');
+    }finally{
+      el.send.disabled=false;
+    }
   }
-}
 
-  /* ===== Modal / Drawer ===== */
+  /* ---------- MODAL / DRAWER ---------- */
   function openModal(){
     $('#oyOpen1')?.setAttribute('hidden','');
     $('#oyOpen2')?.setAttribute('hidden','');
+    if(!el.modal) return console.warn('Chat modal not found');
     el.modal.hidden=false; el.overlay.hidden=false; document.body.style.overflow='hidden'; bootOnce();
   }
   function closeModal(){
@@ -248,11 +262,12 @@ async function send() {
   function toggleDrawer(){ const open=!el.drawer.classList.contains('open'); el.drawer.classList.toggle('open', open); document.body.style.overflow=open?'hidden':''; }
   function closeDrawer(){ el.drawer.classList.remove('open'); document.body.style.overflow=''; }
 
-  /* ===== Boot ===== */
+  /* ---------- BOOT ---------- */
   function bootOnce(){
+    if (!el.modal) return;
     if (el.modal.dataset.boot) return; el.modal.dataset.boot='1';
-    el.accName.textContent=state.account.name||'Хэрэглэгч';
-    el.accCode.textContent=state.account.code||'OY-0000';
+    el.accName && (el.accName.textContent=state.account.name||'Хэрэглэгч');
+    el.accCode && (el.accCode.textContent=state.account.code||'OY-0000');
     renderMenu(); renderAgeCats(); renderSpecialCats(); redrawActive();
     if(state.current && state.active[state.current]){
       el.title.textContent=`Оюунсанаа — ${state.active[state.current].name}`;
@@ -262,7 +277,9 @@ async function send() {
     }
   }
 
-  /* ===== Events ===== */
+  /* ---------- EVENTS ---------- */
+  el.open1?.addEventListener('click', openModal);
+  el.open2?.addEventListener('click', openModal);
   el.overlay?.addEventListener('click', closeModal);
   el.btnClose?.addEventListener('click', closeModal);
   el.btnDrawer?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); el.guidesWrap.hidden=true; toggleDrawer(); });
@@ -275,9 +292,7 @@ async function send() {
   el.send?.addEventListener('click', send);
   el.input?.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
 
-  // гаднаас дуудахаар үлдээнэ
-  window.OY_OPEN = openModal;
+  // Глобал дуудлага (Wix товчоос)
+  window.OY_OPEN  = openModal;
+  window.OY_CLOSE = closeModal;
 })();
-
-
-
