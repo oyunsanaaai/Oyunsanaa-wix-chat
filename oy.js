@@ -205,7 +205,7 @@
     arr.push({t:Date.now(), who, html}); localStorage.setItem(k, JSON.stringify(arr));
   }
   // --- CHAT илгээх (жинхэнэ API хувилбар) ---
-const OY_API_BASE = "https://oyunsanaa-wix-chat.vercel.app"; // өөрийн Vercel домэйноо тавь
+const OY_const OY_API_BASE = "https://oyunsanaa-wix-chat.vercel.app";
 
 async function send() {
   const t = (el.input?.value || "").trim();
