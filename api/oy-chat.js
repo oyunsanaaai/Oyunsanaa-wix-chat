@@ -2,25 +2,19 @@
 export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
-      // api/oy-chat.js дээр 
-const { message = '', chatSlug = '', history = [] } = req.body || {};
-// Энэ нь буруу - "msg" байх ёстой
-
-// 23-р мөрөнд:
-{ role: 'user', content: String(message) }
-// Энэ ч мөн "msg" байх ёстой
+      return res.status(405).json({ error: 'Use POST' });
     }
 
     const key = process.env.OPENAI_API_KEY;
     if (!key) return res.status(500).json({ error: 'No OPENAI_API_KEY' });
 
     // Клиентээс ирэх өгөг
-    const { message = '', chatSlug = '', history = [] } = req.body || {};
+    const { msg = '', chatSlug = '', history = [] } = req.body || {};
 
     // Сүүлийн 10 мессежийг цэвэр текст болгоно
     const last = (history || []).slice(-10).map(m => ({
       role: m.who === 'user' ? 'user' : 'assistant',
-     { role: 'user', content: String(message) }
+      content: String(m.html || '').replace(/<[^>]+>/g, '')
     }));
 
     const system = [
@@ -42,7 +36,7 @@ const { message = '', chatSlug = '', history = [] } = req.body || {};
         messages: [
           { role: 'system', content: system },
           ...last,
-          { role: 'user', content: String(message) }
+          { role: 'user', content: String(msg) }
         ]
       })
     });
@@ -50,12 +44,12 @@ const { message = '', chatSlug = '', history = [] } = req.body || {};
     if (!r.ok) {
       const txt = await r.text();
       return res.status(r.status).json({ error: txt });
-      // Жич: Vercel Logs дээр алдааг харахад амар
     }
 
     const data = await r.json();
-    const reply = (data?.choices?.[0]?.message?.content || 'Ойлголоо. 🌿').trim();
+    const reply = (data?.choices?.[0]?.message?.content || 'Ойлголоо.').trim();
     return res.json({ reply });
+
   } catch (e) {
     return res.status(500).json({ error: String(e) });
   }
