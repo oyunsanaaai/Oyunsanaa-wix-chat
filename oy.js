@@ -283,7 +283,17 @@
 
   // Wix дээр товчоор дуудах шаардлагатай бол:
   window.OY_OPEN = openModal;
+// Chat-г нээх функц
+window.openOyunChat = function () {
+  document.getElementById('oyOverlay').hidden = false;
+  document.getElementById('oyModal').hidden = false;
+};
 
+// Chat-г хаах функц
+window.closeOyunChat = function () {
+  document.getElementById('oyOverlay').hidden = true;
+  document.getElementById('oyModal').hidden = true;
+};
 })();
 
 
