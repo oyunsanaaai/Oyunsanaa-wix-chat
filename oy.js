@@ -275,14 +275,7 @@
   $('#itemGuides')?.addEventListener('click', ()=>{ el.guidesWrap.hidden = !el.guidesWrap.hidden; });
   el.send?.addEventListener('click', send);
   el.input?.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
-
-  // Автоматаар нээх
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', openModal);
-  } else {
-    openModal();
-  }
-
+  
   // Wix дээр товчоор дуудах шаардлагатай бол:
   window.OY_OPEN = openModal;
 
