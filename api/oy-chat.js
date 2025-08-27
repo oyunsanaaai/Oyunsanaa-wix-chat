@@ -2,7 +2,13 @@
 export default async function handler(req, res) {
   try {
     if (req.method !== 'POST') {
-      return res.status(405).json({ error: 'Use POST' });
+      // api/oy-chat.js дээр 
+const { message = '', chatSlug = '', history = [] } = req.body || {};
+// Энэ нь буруу - "msg" байх ёстой
+
+// 23-р мөрөнд:
+{ role: 'user', content: String(message) }
+// Энэ ч мөн "msg" байх ёстой
     }
 
     const key = process.env.OPENAI_API_KEY;
@@ -14,7 +20,7 @@ export default async function handler(req, res) {
     // Сүүлийн 10 мессежийг цэвэр текст болгоно
     const last = (history || []).slice(-10).map(m => ({
       role: m.who === 'user' ? 'user' : 'assistant',
-      content: String(m.html || '').replace(/<[^>]+>/g, '')
+     { role: 'user', content: String(message) }
     }));
 
     const system = [
