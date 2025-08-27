@@ -275,11 +275,25 @@
   $('#itemGuides')?.addEventListener('click', ()=>{ el.guidesWrap.hidden = !el.guidesWrap.hidden; });
   el.send?.addEventListener('click', send);
   el.input?.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
+  $w.onReady(function () {
+  // Чиний товчны ID – Properties панелаас #chatButton гэж өгсөн байх
+  const ids = ['#chatButton']; // Хэрэв өөр хэдэн товч холбох бол энд нэмж бичнэ
+
+  ids.forEach(sel => {
+    const btn = $w(sel);
+    if (btn && btn.onClick) {
+      // Wix-ийн линк үсрэлтийг салга
+      try { btn.link = ''; } catch (e) {}
+
+      // Дармагц манай чатыг нээнэ
+      btn.onClick(() => {
+        if (typeof window.OY_OPEN === 'function') {
+          window.OY_OPEN();
+        }
+      });
+    }
+  });
+});
   
-  // Wix дээр товчоор дуудах шаардлагатай бол:
-  window.OY_OPEN = openModal;
-
-})();
-
 
 
