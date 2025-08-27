@@ -275,25 +275,16 @@
   $('#itemGuides')?.addEventListener('click', ()=>{ el.guidesWrap.hidden = !el.guidesWrap.hidden; });
   el.send?.addEventListener('click', send);
   el.input?.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
- if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', openModal);
-  } else {
-    openModal();
-  }
-
-  // Wix дээр товчоор дуудах шаардлагатай бол:
-  window.OY_OPEN = openModal;
-// Chat-г нээх функц
+// Chat-ийг нээх функц
 window.openOyunChat = function () {
-  document.getElementById('oyOverlay').hidden = false;
-  document.getElementById('oyModal').hidden = false;
-};
+  document.getElementById("oyOverlay").hidden = false;
+  document.getElementById("oyModal").hidden = false;
+}
 
-// Chat-г хаах функц
+// Chat-ийг хаах функц
 window.closeOyunChat = function () {
-  document.getElementById('oyOverlay').hidden = true;
-  document.getElementById('oyModal').hidden = true;
-};
+  document.getElementById("oyOverlay").hidden = true;
+  document.getElementById("oyModal").hidden = true;
+}
 })();
-
 
