@@ -1,91 +1,180 @@
-<!-- OYUNSANAA CHAT WIDGET (Wix) -->
-<link rel="stylesheet" href="https://oyunsanaa-wix-chat.vercel.app/oy.css"/>
+<script>
+(function(){
+  // ====== DOM refs ======
+  const modal   = document.querySelector('.oy-modal');
+  const overlay = document.querySelector('.oy-overlay');
+  const drawer  = document.querySelector('.oy-drawer');
+  const btnDrawer = document.getElementById('btnDrawer'); // байхгүй бол OK
+  const btnClose  = document.getElementById('btnClose');  // байхгүй бол OK
+  const fab     = document.querySelector('.oy-fab');      // байхгүй бол OK
+  const textarea = document.querySelector('.oy-textarea'); // Composer textarea (байхгүй бол алгасна)
+  const sendBtn  = document.querySelector('.oy-send');     // Send button (байхгүй бол алгасна)
+  const iframe   = document.getElementById('oy-frame') || document.querySelector('.oy-modal iframe');
 
-<style>
-  /* Wix дээр зөвхөн өөрийн товчоор нээх тул доторх 2 FAB-ыг нууж байна */
-  .oy-fab{display:none!important;}
-</style>
+  // ====== State ======
+  let lastActive = null;
+  const qs = new URLSearchParams(location.search);
+  const IS_EMBED = qs.get('embed') === '1';
+  const AUTO_OPEN = qs.get('open') === '1';
 
-<!-- Чатны HTML бүтцийг шууд оруулж байна -->
-<div id="oyOverlay" class="oy-overlay" hidden></div>
-<div id="oyModal" class="oy-modal" hidden role="dialog" aria-modal="true" aria-label="Чат цонх">
-  <header class="oy-header" id="oyHeader">
-    <button id="btnDrawer" class="oy-iconbtn" aria-label="Меню">
-      <span class="braille">Меню</span>
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/>
-      </svg>
-    </button>
-    <div id="chatTitle" class="oy-title">Оюунсанаа — Сонголтоо хийнэ үү</div>
-    <button id="btnClose" class="oy-iconbtn" aria-label="Хаах">
-      <svg viewBox="0 0 24 24" aria-hidden="true">
-        <path d="M18.3 5.7L12 12l-6.3-6.3L4.3 7.1 10.6 13.4 4.3 19.7l1.4 1.4 6.3-6.3 6.3 6.3 1.4-1.4-6.3-6.3 6.3-6.3z"/>
-      </svg>
-    </button>
-  </header>
+  // ====== Utils ======
+  function isMobile(){ return window.innerWidth <= 520; }
 
-  <aside id="oyDrawer" class="oy-drawer" aria-label="Меню">
-    <div class="oy-menu">
-      <div class="oy-card">
-        <div class="kv">Нэр: <b id="accName">Хэрэглэгч</b></div>
-        <div class="kv">Код: <b id="accCode">OY-0000</b></div>
-      </div>
-      <div id="menuList"></div>
-      <div id="itemGuides" class="oy-item" data-menu="guides">
-        <span class="i">
-          <svg viewBox="0 0 24 24" aria-hidden="true">
-            <path d="M21 15a4 4 0 0 1-4 4H8l-5 4V5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
-          </svg>
-        </span>
-        <span class="t"><b>Сэтгэлийн хөтөч (чатууд)</b></span>
-      </div>
+  function lockScroll(lock){
+    if (lock) {
+      document.body.dataset._prevOverflow = document.body.style.overflow || '';
+      document.body.style.overflow = 'hidden';
+    } else {
+      document.body.style.overflow = document.body.dataset._prevOverflow || '';
+      delete document.body.dataset._prevOverflow;
+    }
+  }
 
-      <section id="guidesWrap" class="oy-section" hidden aria-label="Сэтгэлийн хөтөч — ангиллууд">
-        <div class="guides-heading">Насны ангилал</div>
-        <div id="guideCatsAge" class="oy-pills"></div>
-        <div class="guides-heading">Тусгай хэрэгцээт</div>
-        <div id="guideCatsSpecial" class="oy-pills"></div>
-      </section>
+  function fitModalHeight(){
+    if (!modal) return;
+    if (isMobile()){
+      // iOS/Android keyboard-тай үед өндөр доголохыг багасгана
+      modal.style.height = window.innerHeight + 'px';
+    } else {
+      modal.style.height = ''; // CSS-дээ даатгана (80–86vh)
+    }
+  }
 
-      <section id="activeWrap" class="oy-section">
-        <h4>Идэвхтэй чатууд</h4>
-        <div id="activeList"></div>
-      </section>
-    </div>
+  function focusFirst(el){
+    if (!el) return;
+    const focusables = el.querySelectorAll('button, [href], input, textarea, select, [tabindex]:not([tabindex="-1"])');
+    if (focusables.length) focusables[0].focus();
+  }
 
-    <div id="oyPanel" class="oy-panel" hidden>
-      <header>
-        <button id="oyPanelBack" class="oy-back">Буцах</button>
-        <div id="oyPanelTitle" class="oy-panel-title">Панел</div>
-      </header>
-      <div id="oyPanelBody" class="oy-panel-body"></div>
-    </div>
-  </aside>
+  // ====== Open / Close ======
+  window.OY_OPEN = function(){
+    if (!modal) return;
+    lastActive = document.activeElement;
+    modal.hidden = false;
+    lockScroll(true);
+    fitModalHeight();
+    focusFirst(modal);
+  };
 
-  <main class="oy-chat" id="oyChat">
-    <div id="oyStream" class="oy-stream"></div>
-  </main>
+  window.OY_CLOSE = function(){
+    if (!modal) return;
+    modal.hidden = true;
+    lockScroll(false);
+    if (lastActive && typeof lastActive.focus === 'function') {
+      try{ lastActive.focus(); }catch(e){}
+    }
+  };
 
-  <div class="oy-composer">
-    <div class="oy-row">
-      <label for="oyFile" class="oy-file" aria-label="Файл/зураг нэмэх" title="Файл/зураг нэмэх">
-        <svg viewBox="0 0 24 24" aria-hidden="true">
-          <path d="M21 8.5l-8.485 8.485a5 5 0 11-7.071-7.071L14.5 1.858a3.5 3.5 0 114.95 4.95L9.88 16.379a2 2 0 11-2.828-2.828L16 4.603"
-            fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
-        </svg>
-      </label>
-      <input id="oyFile" type="file" multiple accept="image/*,.pdf" hidden />
-      <textarea id="oyInput" class="oy-textarea" rows="1" placeholder="Энд бичээд Enter дарна уу…"></textarea>
-      <button id="btnSend" class="oy-send" title="Илгээх">Илгээх</button>
-    </div>
-  </div>
-</div>
+  // Overlay click → close
+  if (overlay){
+    overlay.addEventListener('click', () => OY_CLOSE());
+  }
 
-<!-- Чатны логик -->
-<script defer src="https://oyunsanaa-wix-chat.vercel.app/oy.js"></script>
+  // Drawer toggle
+  if (btnDrawer && drawer){
+    btnDrawer.addEventListener('click', () => {
+      drawer.classList.toggle('open');
+    });
+  }
+  if (btnClose){
+    btnClose.addEventListener('click', () => OY_CLOSE());
+  }
 
+  // Esc → close
+  document.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && modal && !modal.hidden) {
+      OY_CLOSE();
+    }
+  });
 
+  // Resize / orientation
+  window.addEventListener('resize', fitModalHeight);
+  window.addEventListener('orientationchange', fitModalHeight);
 
+  // URL flags
+  if (IS_EMBED){
+    // Эмбед үед дотоод header/bubble-ийг нуух шаардлагатай бол root атрибут тавьж өгье
+    document.documentElement.setAttribute('data-embed', '1');
+    if (fab) fab.style.display = 'none';
+  }
+  if (AUTO_OPEN){
+    // Хуудас ачаалмагц автоматаар нээнэ
+    requestAnimationFrame(() => OY_OPEN());
+  }
 
+  // ====== Composer (optional) ======
+  function updateSendState(){
+    if (!textarea || !sendBtn) return;
+    const val = (textarea.value || '').trim();
+    sendBtn.disabled = val.length === 0;
+  }
 
+  function autosize(e){
+    if (!textarea) return;
+    textarea.style.height = 'auto';
+    // max-height CSS-д байгаа: 120px — хэрэглэнэ
+    textarea.style.height = Math.min(textarea.scrollHeight, 120) + 'px';
+  }
 
+  if (textarea){
+    textarea.addEventListener('input', () => { autosize(); updateSendState(); });
+    textarea.addEventListener('focus', () => { autosize(); });
+    // Enter → илгээх, Shift+Enter → шинэ мөр
+    textarea.addEventListener('keydown', (e) => {
+      if (e.key === 'Enter' && !e.shiftKey){
+        if (sendBtn && !sendBtn.disabled){
+          e.preventDefault();
+          sendBtn.click();
+        }
+      }
+    });
+    // Анхны төлөв
+    autosize();
+    updateSendState();
+  }
+
+  if (sendBtn){
+    sendBtn.addEventListener('click', () => {
+      // Энд өөрийн илгээх логикоороо солих
+      // Жишээ: window.postMessage(...) эсвэл өөр handler
+      // Илгээсний дараа textarea-г цэвэрлэж, хэмжээ/төлвийг шинэчилнэ
+      if (!textarea) return;
+      const msg = textarea.value.trim();
+      if (!msg) return;
+      // TODO: send(msg)
+      textarea.value = '';
+      autosize();
+      updateSendState();
+      textarea.focus();
+    });
+  }
+
+  // ====== iframe ↔ parent харилцах (сонголттой) ======
+  // Чат iframe дотроос window.parent.postMessage('oy:close', '*') гэж дуудах боломж.
+  window.addEventListener('message', (evt) => {
+    try{
+      if (evt.data === 'oy:close') OY_CLOSE();
+      if (typeof evt.data === 'object' && evt.data.type === 'oy:open') OY_OPEN();
+    }catch(e){}
+  });
+
+  // Аюулгүй байдлын жижиг сайжруулалт: iframe sandbox/allow аттрибут шалгая
+  if (iframe){
+    const allow = iframe.getAttribute('allow') || '';
+    const need = ['clipboard-write','microphone','camera'];
+    need.forEach(flag => {
+      if (!allow.includes(flag)){
+        iframe.setAttribute('allow', (allow ? allow + '; ' : '') + flag);
+      }
+    });
+    // referrerpolicy байхгүй бол нэмье
+    if (!iframe.getAttribute('referrerpolicy')){
+      iframe.setAttribute('referrerpolicy','no-referrer');
+    }
+    // lazy биш — чат тул eager байж болно
+    if (!iframe.getAttribute('loading')){
+      iframe.setAttribute('loading','eager');
+    }
+  }
+})();
+</script>
