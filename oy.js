@@ -167,19 +167,77 @@
     closeDrawer();
     loadChat(key, true);
   }
-  function redrawActive(){
-    el.activeList.innerHTML='';
-    Object.entries(state.active).forEach(([key,m])=>{
-      const row=document.createElement('div'); row.className='item';
-      const dot=document.createElement('span'); dot.className='dot'; dot.style.background=m.color;
-      const name=document.createElement('div'); name.className='name'; name.textContent=m.name;
-      const x=document.createElement('button'); x.textContent='×'; x.title='Идэвхтээгээс хасах';
-      name.onclick=()=>{ state.current=key; save(); el.title.textContent=`Оюунсанаа — ${m.name}`; loadChat(key,false); closeDrawer(); };
-      x.onclick=(e)=>{ e.stopPropagation(); delete state.active[key]; if(state.current===key) state.current=null; save(); redrawActive(); };
-      row.append(dot,name,x); el.activeList.appendChild(row);
-    });
-  }
+ function redrawActive(){
+  el.activeList.innerHTML = '';
 
+  Object.entries(state.active).forEach(([key, m]) => {
+    // контейнер мөр
+    const row  = document.createElement('div');
+    row.className = 'item';
+    row.style.cssText = [
+      'display:flex',
+      'align-items:center',
+      'gap:10px',
+      'width:100%',
+      'min-height:40px',
+      'padding:8px 12px',
+      'margin:8px 0',
+      'border:1px solid var(--line)',
+      'border-radius:14px',
+      'background:#fff',
+      'box-sizing:border-box'
+    ].join(';');
+
+    // өнгийн дугуй
+    const dot  = document.createElement('span');
+    dot.className = 'dot';
+    dot.style.cssText = 'width:12px;height:12px;border-radius:999px;flex:0 0 12px;background:'+(m.color||'#486573');
+
+    // нэр
+    const name = document.createElement('div');
+    name.className = 'name';
+    name.textContent = m.name;
+    name.style.cssText = [
+      'flex:1 1 auto',
+      "font:400 14px/1.25 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif",
+      'white-space:nowrap','overflow:hidden','text-overflow:ellipsis'
+    ].join(';');
+
+    // × товч
+    const x    = document.createElement('button');
+    x.textContent = '×';
+    x.title = 'Идэвхтээгээс хасах';
+    x.style.cssText = [
+      'appearance:none','-webkit-appearance:none',
+      'flex:0 0 auto','padding:2px 8px',
+      "font:600 12px/1 -apple-system,BlinkMacSystemFont,'Segoe UI',Roboto,Arial,sans-serif",
+      'border:none','border-radius:10px',
+      'background:#eef0f3','cursor:pointer',
+      'position:relative','z-index:1'
+    ].join(';');
+
+    // үйлдлүүд
+    name.onclick = () => {
+      state.current = key; save();
+      el.title.textContent = `Оюунсанаа — ${m.name}`;
+      loadChat(key, false); closeDrawer();
+    };
+
+    x.onclick = (e) => {
+      e.stopPropagation();
+      delete state.active[key];
+      if (state.current === key) {
+        state.current = null;
+        el.stream.innerHTML = '';
+        el.title.textContent = 'Оюунсанаа — Сонголтоо хийнэ үү';
+      }
+      save(); redrawActive();
+    };
+
+    row.append(dot, name, x);           // дугуй → нэр → ×
+    el.activeList.appendChild(row);
+  });
+}
   /* ===== Chat ===== */
   function loadChat(key,greet){
     el.stream.innerHTML='';
