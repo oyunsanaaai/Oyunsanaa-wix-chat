@@ -1,214 +1,96 @@
 <!doctype html>
 <html lang="mn">
 <head>
-<meta charset="utf-8"/>
-<meta name="viewport" content="width=device-width, initial-scale=1"/>
-<title>OyunSanaa Chat</title>
-<style>
-:root{
-  --brand:#486573; /* ерөнхий ногоон */
-  --bg:#fff; --text:#222; --muted:#8a8a8a; --line:#e5e7eb;
-  --user:#E8F0E9; --bot:#fff; --shadow:0 10px 30px rgba(0,0,0,.12);
-  --font-ui: Roboto, -apple-system, "Segoe UI", Arial, sans-serif;
-  --t-base:16px; --line-compact:1.25;
-  --icon-header:#CFE0C9; --icon-menu:#6F8B62;
-}
-
-/* БҮТЭН ДЭЛГЭЦ ХУУДАС */
-html,body{height:100%;margin:0;background:var(--bg);color:var(--text)}
-.oy-page{position:relative;min-height:100dvh;display:flex;flex-direction:column}
-
-/* ТОЛГОЙ */
-.oy-header{position:sticky;top:0;height:52px;background:var(--brand);color:#fff;
-  display:flex;align-items:center;z-index:5}
-.oy-iconbtn{background:transparent;border:none;color:var(--icon-header);cursor:pointer;
-  width:44px;height:44px;display:grid;place-items:center}
-.oy-iconbtn svg{width:18px;height:18px}
-.oy-title{flex:1;text-align:center;font:400 var(--t-base)/1.2 var(--font-ui);
-  padding:0 6px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-
-/* DRAWER (зүүнээс шургуулна) */
-.oy-drawer{position:fixed;inset:52px auto 0 0;width:min(84%,320px);background:#fff;
-  border-right:1px solid var(--line);transform:translateX(-102%);transition:transform .25s ease;
-  display:flex;flex-direction:column;z-index:6;box-shadow:0 10px 30px rgba(0,0,0,.08)}
-.oy-drawer.open{transform:translateX(0)}
-.oy-menu{flex:1;overflow:auto;padding:8px;-webkit-overflow-scrolling:touch}
-
-/* MENU item */
-.oy-item{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;
-  cursor:pointer;border:1px solid var(--line);background:#fff;margin:6px 4px;transition:background .15s}
-.oy-item:hover{background:#f9f9fb}
-.oy-item:focus-visible{outline:2px solid color-mix(in srgb, var(--brand) 60%, white);outline-offset:2px}
-.oy-item .i{width:18px;height:18px;flex:0 0 18px;display:grid;place-items:center;color:var(--icon-menu)}
-.oy-item .i svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.oy-item .t{flex:1;font:400 var(--t-base)/var(--line-compact) var(--font-ui)}
-
-/* ЧАТ БҮЛЭГ */
-.oy-chat{position:relative;flex:1;background:#fafafa;overflow:auto;
-  -webkit-overflow-scrolling:touch;overscroll-behavior:contain}
-.oy-stream{padding:12px 12px 100px;max-width:720px;margin:0 auto}
-.oy-bubble{max-width:84%;padding:10px 12px;border-radius:20px;margin:6px 0;
-  font:14px/1.45 var(--font-ui);box-shadow:0 13px 28px rgba(0,0,0,.10)}
-.oy-bot{background:var(--bot);border:1px solid var(--line);border-top-left-radius:6px}
-.oy-user{background:var(--user);border:1px solid var(--line);border-top-right-radius:6px;margin-left:auto}
-.oy-meta{color:var(--muted);font:11px var(--font-ui);margin:2px 0 0}
-
-/* COMPOSER */
-.oy-composer{position:sticky;bottom:0;left:0;right:0;background:#fff;border-top:1px solid var(--line);
-  padding-bottom:max(8px, env(safe-area-inset-bottom)); z-index:4}
-.oy-row{display:grid;grid-template-columns:28px 1fr 72px;gap:8px;padding:8px;align-items:center;max-width:720px;margin:0 auto}
-.oy-file{width:20px;height:20px;display:grid;place-items:center;border:1px dashed var(--line);
-  border-radius:14px;background:#fff;cursor:pointer;color:var(--brand)}
-.oy-textarea{min-height:42px;max-height:120px;resize:none;border:1px solid var(--line);border-radius:16px;
-  padding:10px 12px;font:14px/1.35 var(--font-ui);outline:none;background:#fdfdfd;
-  -webkit-tap-highlight-color:transparent;touch-action:manipulation}
-.oy-send{height:40px;border:none;background:var(--brand);color:#fff;border-radius:14px;
-  padding:0 14px;cursor:pointer;transition:background .15s, opacity .15s}
-.oy-send:disabled{opacity:.55;cursor:not-allowed}
-
-/* Аccessibility / Hover */
-.oy-iconbtn:hover{background:#0000000d;border-radius:10px}
-.oy-send:focus-visible,.oy-iconbtn:focus-visible,.oy-item:focus-visible{
-  outline:2px solid color-mix(in srgb, var(--brand) 60%, white);outline-offset:2px;border-radius:12px}
-
-/* EMBED горим: Wix дотор iframe-ээр суух үед толгой/шургуулгыг нуух */
-:root[data-embed="1"] .oy-header,
-:root[data-embed="1"] .oy-drawer{display:none}
-:root[data-embed="1"] .oy-chat{padding-top:0}
-
-/* DARK MODE (санал) */
-@media (prefers-color-scheme: dark){
-  :root{ --bg:#121416; --text:#f3f5f7; --bot:#181b1e; --user:#1d2a22; --line:#24282d; --muted:#a9b1b8 }
-  .oy-chat{background:#16191c}
-  .oy-composer{background:#181b1e;border-top-color:#24282d}
-}
-</style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <title>Оюунсанаа Chat</title>
+  <link rel="stylesheet" href="./styles/oy.css" />
 </head>
 <body>
-  <div class="oy-page">
-    <!-- Толгой -->
+  <!-- Overlay (зөвхөн mobile-д хэрэглэнэ) -->
+  <div id="oyOverlay" class="oy-overlay" hidden></div>
+
+  <!-- FULLSCREEN CHAT APP -->
+  <div id="oyModal" class="oy-modal" hidden role="dialog" aria-modal="true" aria-label="Чат">
+
+    <!-- Header -->
     <header class="oy-header" id="oyHeader">
-      <button class="oy-iconbtn" id="btnDrawer" aria-label="Цэс">
-        <svg viewBox="0 0 24 24"><path d="M4 6h16M4 12h16M4 18h16"/></svg>
+      <button id="btnDrawer" class="oy-iconbtn" aria-label="Меню">
+        <span class="braille">Меню</span>
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M3 6h18v2H3zM3 11h18v2H3zM3 16h18v2H3z"/>
+        </svg>
       </button>
-      <div class="oy-title">OyunSanaa Chat</div>
-      <span class="oy-iconbtn" aria-hidden="true" style="opacity:0;pointer-events:none"></span>
+      <div id="chatTitle" class="oy-title">Оюунсанаа — Сонголтоо хийнэ үү</div>
+      <button id="btnClose" class="oy-iconbtn" aria-label="Хаах">
+        <svg viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M18.3 5.7L12 12 5.7 5.7 4.3 7.1 10.6 13.4 4.3 19.7l1.4 1.4 6.3-6.3 6.3 6.3 1.4-1.4-6.3-6.3 6.3-6.3z"/>
+        </svg>
+      </button>
     </header>
 
-    <!-- Drawer -->
-    <aside class="oy-drawer" id="oyDrawer">
-      <div class="oy-menu" id="oyMenu"></div>
+    <!-- Sidebar / Drawer -->
+    <aside id="oyDrawer" class="oy-drawer" aria-label="Меню">
+      <div class="oy-menu">
+        <div class="oy-card">
+          <div class="kv">Нэр: <b id="accName">Хэрэглэгч</b></div>
+          <div class="kv">Код: <b id="accCode">OY-0000</b></div>
+        </div>
+
+        <div id="menuList"></div>
+
+        <div id="itemGuides" class="oy-item" data-menu="guides">
+          <span class="i">
+            <svg viewBox="0 0 24 24" aria-hidden="true">
+              <path d="M21 15a4 4 0 0 1-4 4H8l-5 4V5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
+            </svg>
+          </span>
+          <span class="t"><b>Сэтгэлийн хөтөч (чатууд)</b></span>
+        </div>
+
+        <section id="guidesWrap" class="oy-section" hidden aria-label="Сэтгэлийн хөтөч — ангиллууд">
+          <div class="guides-heading">Насны ангилал</div>
+          <div id="guideCatsAge" class="oy-pills"></div>
+          <div class="guides-heading">Тусгай хэрэгцээт</div>
+          <div id="guideCatsSpecial" class="oy-pills"></div>
+        </section>
+
+        <section id="activeWrap" class="oy-section">
+          <h4>Идэвхтэй чатууд</h4>
+          <div id="activeList"></div>
+        </section>
+      </div>
+
+      <div id="oyPanel" class="oy-panel" hidden>
+        <header>
+          <button id="oyPanelBack" class="oy-back">Буцах</button>
+          <div id="oyPanelTitle" class="oy-panel-title">Панел</div>
+        </header>
+        <div id="oyPanelBody" class="oy-panel-body"></div>
+      </div>
     </aside>
 
-    <!-- Чат -->
-    <main class="oy-chat">
-      <div class="oy-stream" id="oyStream">
-        <div class="oy-bubble oy-bot">Сайн байна уу! 👋 Эндээс захиагаа бичээрэй.</div>
-      </div>
-
-      <div class="oy-composer">
-        <div class="oy-row">
-          <button class="oy-file" id="oyFile" title="Файл"></button>
-          <textarea class="oy-textarea" id="oyInput" placeholder="Энд бич... (Shift+Enter = шинэ мөр)"></textarea>
-          <button class="oy-send" id="oySend">Илгээ</button>
-        </div>
-      </div>
+    <!-- Chat area -->
+    <main class="oy-chat" id="oyChat">
+      <div id="oyStream" class="oy-stream"></div>
     </main>
+
+    <!-- Composer -->
+    <div class="oy-composer">
+      <div class="oy-row">
+        <label for="oyFile" class="oy-file" aria-label="Файл/зураг нэмэх" title="Файл/зураг нэмэх">
+          <svg viewBox="0 0 24 24" aria-hidden="true">
+            <path d="M21 8.5l-8.485 8.485a5 5 0 11-7.071-7.071L14.5 1.858a3.5 3.5 0 114.95 4.95L9.88 16.379a2 2 0 11-2.828-2.828L16 4.603"
+              fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"/>
+          </svg>
+        </label>
+        <input id="oyFile" type="file" multiple accept="image/*,.pdf" hidden />
+        <textarea id="oyInput" class="oy-textarea" rows="1" placeholder="Энд бичээд Enter дарна уу…"></textarea>
+        <button id="btnSend" class="oy-send" title="Илгээх">Илгээх</button>
+      </div>
+    </div>
   </div>
 
-<script>
-/* ====== ТУСЛАХ ====== */
-const $ = s => document.querySelector(s);
-
-/* ====== DRAWER ====== */
-const drawer = $('#oyDrawer');
-const btnDrawer = $('#btnDrawer');
-if (btnDrawer && drawer){
-  btnDrawer.addEventListener('click', ()=> drawer.classList.toggle('open'));
-}
-
-/* ====== 9 ЦЭС: автоматаар үүсгэнэ ====== */
-const OY_MENU_ITEMS = [
-  { id:'home',     title:'Нүүр',            href:'/' },
-  { id:'programs', title:'Хөтөлбөрүүд',     href:'/programs' },
-  { id:'ages',     title:'Насны ангилал',   href:'/ages' },
-  { id:'guides',   title:'Гарын авлага',    href:'/guides' },
-  { id:'mind',     title:'Оюун санаа',      href:'/mind' },
-  { id:'heart',    title:'Зүрх сэтгэл',     href:'/heart' },
-  { id:'health',   title:'Эрүүл амьдрал',   href:'/health' },
-  { id:'pricing',  title:'Төлбөр',          href:'/pricing' },
-  { id:'settings', title:'Тохиргоо',        href:'/settings' },
-];
-const OY_ICON = <svg viewBox="0 0 24 24"><path d="M4 12h16M4 6h16M4 18h16" stroke="currentColor" fill="none" stroke-width="1.6" stroke-linecap="round"/></svg>;
-(function renderMenu(){
-  const wrap = $('#oyMenu'); if (!wrap) return;
-  wrap.innerHTML = '';
-  OY_MENU_ITEMS.forEach(item=>{
-    const btn = document.createElement('button');
-    btn.className = 'oy-item'; btn.type='button';
-    btn.innerHTML = <span class="i">${OY_ICON}</span><span class="t">${item.title}</span>;
-    btn.addEventListener('click', ()=> { if(item.href) location.href = item.href; });
-    wrap.appendChild(btn);
-  });
-})();
-
-/* ====== ЧАТ COMPOSER ====== */
-const input = $('#oyInput');
-const sendBtn = $('#oySend');
-const stream = $('#oyStream');
-
-function autoSize(){
-  if (!input) return;
-  input.style.height = 'auto';
-  const max = parseInt(getComputedStyle(input).getPropertyValue('max-height')) || 120;
-  input.style.height = Math.min(input.scrollHeight, max) + 'px';
-}
-if (input){
-  input.addEventListener('input', autoSize);
-  window.addEventListener('resize', autoSize);
-  autoSize();
-}
-
-function sendMessage(){
-  const text = (input?.value || '').trim();
-  if (!text) return;
-  const me = document.createElement('div');
-  me.className = 'oy-bubble oy-user';
-  me.textContent = text;
-  stream.appendChild(me);
-
-  // TODO: энд өөрийн backend/WebSocket руу илгээнэ
-  // fetch('/api/send', {method:'POST', body: JSON.stringify({text})})
-
-  input.value = '';
-  autoSize();
-  stream.scrollTop = stream.scrollHeight;
-}
-if (sendBtn) sendBtn.addEventListener('click', sendMessage);
-if (input){
-  input.addEventListener('keydown', (e)=>{
-    if (e.key === 'Enter' && !e.shiftKey){
-      e.preventDefault();
-      sendMessage();
-    }
-  });
-}
-
-/* ====== EMBED горим (Wix дотор iframe-ээр) ====== */
-const qs = new URLSearchParams(location.search);
-if (qs.get('embed') === '1'){
-  document.documentElement.setAttribute('data-embed','1');
-}
-
-/* ====== iOS 100dvh хамгаалалт (сонголт) ====== */
-let vhTick;
-window.addEventListener('resize', ()=>{
-  clearTimeout(vhTick);
-  vhTick = setTimeout(()=>{
-    document.body.style.setProperty('--vh', window.innerHeight * 0.01 + 'px');
-  }, 120);
-});
-</script>
+  <script defer src="./scripts/oy.js"></script>
 </body>
 </html>
-Write to Enkh-Oyun Baasankhuu
