@@ -173,3 +173,34 @@
   autoSize();
 })();
 </script>
+<script>
+(function(){
+  const input  = document.querySelector('.oy-textarea');
+  const send   = document.querySelector('.oy-send');
+  const stream = document.querySelector('.oy-stream');
+  if(!input || !send || !stream) return;
+
+  function autoSize(){
+    input.style.height = 'auto';
+    input.style.height = Math.min(input.scrollHeight, 120) + 'px';
+  }
+  function sendMsg(){
+    const t = (input.value || '').trim();
+    if(!t) return;
+    const div = document.createElement('div');
+    div.className = 'oy-bubble oy-user';
+    div.textContent = t;
+    stream.appendChild(div);
+    input.value = '';
+    autoSize();
+    stream.scrollTop = stream.scrollHeight;
+  }
+
+  input.addEventListener('input', autoSize);
+  send.addEventListener('click', sendMsg);
+  input.addEventListener('keydown', e=>{
+    if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); sendMsg(); }
+  });
+  autoSize();
+})();
+</script>
