@@ -131,21 +131,4 @@ body{margin:0;background:#fff;color:var(--text);overscroll-behavior-y:none}
   -webkit-overflow-scrolling: touch;
   overscroll-behavior: contain;
 }
-/* Илгээх товчны төлөв арай ойлгомжтой */
-.oy-send{ transition: background .15s, opacity .15s; }
-.oy-send:disabled{ opacity:.55; cursor:not-allowed; }
-/* === SAFE PATCH (structure эвдэхгүй) === */
-/* Мобайлд fullscreen өндөр, iOS safe-area */
-@media (max-width:520px){
-  .oy-page{ min-height: 100dvh; }
-}
-/* Доод gesture bar-ыг мөргөлгөхгүй */
-.oy-composer{ padding-bottom: max(8px, env(safe-area-inset-bottom)); }
-/* Чат/цэсний доторх scroll зөөлрүүлнэ, давхар bounce-оос сэргийлнэ */
-.oy-chat, .oy-menu, .oy-panel-body{
-  -webkit-overflow-scrolling: touch;
-  overscroll-behavior: contain;
-}
-/* Илгээх товчны төлөв арай ойлгомжтой */
-.oy-send{ transition: background .15s, opacity .15s; }
-.oy-send:disabled{ opacity:.55; cursor:not-allowed; }
+
