@@ -7,12 +7,6 @@
   <link rel="stylesheet" href="/oy.css?v=1">
   <script defer src="/oy.js?v=1"></script></head>
   <body>
-  <select id="modelSelect">
-    <option value="gpt-3.5-turbo">3.5 : Энгийн/Хурдан</option>
-    <option value="gpt-4o-mini" selected>4o-mini : Дунд</option>
-    <option value="gpt-4o">4o : Гүн/Нарийн</option>
-  </select>
-
   <!-- Overlay (зөвхөн mobile-д хэрэглэнэ) -->
   <div id="oyOverlay" class="oy-overlay" hidden></div>
 
@@ -43,7 +37,11 @@
           <div class="kv">Нэр: <b id="accName">Хэрэглэгч</b></div>
           <div class="kv">Код: <b id="accCode">OY-0000</b></div>
         </div>
-
+<select id="modelSelect">
+  <option value="gpt-3.5-turbo">3.5 : Энгийн/Хурдан</option>
+  <option value="gpt-4o-mini" selected>4o-mini : Дунд</option>
+  <option value="gpt-4o">4o : Гүн/Нарийн</option>
+</select>
         <div id="menuList"></div>
 
         <div id="itemGuides" class="oy-item" data-menu="guides">
