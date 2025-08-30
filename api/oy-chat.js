@@ -1,43 +1,50 @@
-// api/oy-chat.js  (Vercel serverless function / CommonJS)
-module.exports = async (req, res) => {
+// /api/oy-chat.js
+export default async function handler(req, res) {
   if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method Not Allowed' });
+    return res.status(405).json({ error: 'Method not allowed' });
   }
 
   try {
-    const { msg = '', chatSlug = '', history = [] } = req.body || {};
-    const key = process.env.OPENAI_API_KEY;
-    if (!key) return res.status(500).json({ error: 'No API key' });
+    const { model = 'gpt-4o-mini', msg = '', chatSlug = '', history = [] } = req.body || {};
 
-    const last = (history || []).slice(-10).map(m => ({
-      role: m.who === 'user' ? 'user' : 'assistant',
-      content: String(m.html || '').replace(/<[^>]+>/g, '')
-    }));
+    if (!process.env.OPENAI_API_KEY) {
+      // API ключ тохируулаагүй үед алдаа биш — демо хариу буцаая
+      return res.status(200).json({
+        reply: `⚠️ OPENAI_API_KEY тохируулаагүй байна. Демо хариу: ${msg}`,
+      });
+    }
 
-    const system = `Та "Оюунсанаа" нэртэй зөвлөгч. Хэрэглэгч: ${chatSlug}. Монголоор товч хариул.`;
-
+    // OpenAI Chat Completions (simple, найдвартай)
     const r = await fetch('https://api.openai.com/v1/chat/completions', {
       method: 'POST',
       headers: {
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json'
+        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
+        'Content-Type': 'application/json',
       },
       body: JSON.stringify({
-        model: 'gpt-4o-mini',
-        temperature: 0.3,
+        model,                         // gpt-4o эсвэл gpt-4o-mini ирнэ
+        temperature: 0.7,
         messages: [
-          { role: 'system', content: system },
-          ...last,
-          { role: 'user', content: String(msg) }
-        ]
-      })
+          { role: 'system', content: 'Та Монгол хэлээр товч, эелдэг, ойлгомжтой хариулна.' },
+          // history-г хүсвэл өмнөх мессежүүд болгоод шиднэ
+          ...[]
+            .concat(history || [])
+            .filter(Boolean)
+            .map(x => ({ role: x.who === 'user' ? 'user' : 'assistant', content: x.text || x.html || '' })),
+          { role: 'user', content: msg },
+        ],
+      }),
     });
 
     const data = await r.json();
-    const reply = data?.choices?.[0]?.message?.content || 'Алдаа гарлаа.';
+    if (!r.ok) {
+      const errMsg = data?.error?.message || 'OpenAI error';
+      return res.status(500).json({ error: errMsg });
+    }
+
+    const reply = data.choices?.[0]?.message?.content?.trim() || 'Хариу олдсонгүй.';
     return res.status(200).json({ reply });
-  } catch (e) {
-    return res.status(500).json({ error: String(e) });
+  } catch (err) {
+    return res.status(500).json({ error: err.message || 'Server error' });
   }
-};
+}
