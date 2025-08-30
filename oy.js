@@ -270,16 +270,16 @@
   try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
   try {
-    // ⬇️ ЭНЭ Л API ДУУДЛАГА (same-origin)
     const r = await fetch('/api/oy-chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        msg: t,
-        chatSlug: state.current || '',
-        history: hist
-      })
-    });
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: el.modelSelect?.value || "gpt-3.5-turbo",   // ← энд шинэ мөр нэмнэ
+    msg: t,
+    chatSlug: state.current || '',
+    history: hist
+  })
+});
 
     const { reply, error } = await r.json();
     if (error) throw new Error(error);
