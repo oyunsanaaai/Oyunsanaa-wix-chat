@@ -1,4 +1,3 @@
-heddugeer muru// api/oy-chat.js (Vercel serverless function / CommonJS)
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -24,7 +23,7 @@ module.exports = async (req, res) => {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: model || 'gpt-4o-mini',   // <-- эндээс сонгоно (gpt-4o эсвэл gpt-4o-mini)
+        model: model || 'gpt-3.5-turbo',  // Сонгосон model
         temperature: 0.3,
         messages: [
           { role: 'system', content: system },
@@ -33,15 +32,7 @@ module.exports = async (req, res) => {
         ]
       })
     });
-body: JSON.stringify({
-  model: 'gpt-4o-mini',
-  temperature: 0.3,
-  messages: [
-    { role: 'system', content: system },
-    ...last,
-    { role: 'user', content: String(msg) }
-  ]
-})
+
     const data = await r.json();
     const reply = data.choices?.[0]?.message?.content || 'Алдаа гарлаа.';
     return res.status(200).json({ reply });
