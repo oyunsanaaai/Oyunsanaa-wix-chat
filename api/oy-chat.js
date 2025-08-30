@@ -1,43 +1,34 @@
-module.exports = async (req, res) => {
-  if (req.method !== 'POST') {
-    res.setHeader('Allow', 'POST');
-    return res.status(405).json({ error: 'Method Not Allowed' });
+// товчлуурын эвент бүртгэхийг send() функцээс гадуур хийнэ
+document.getElementById("btnSend").addEventListener("click", send);
+
+async function send() {
+  const model = document.getElementById("modelSelect").value || "gpt-3.5-turbo";
+  const message = document.getElementById("oyInput").value.trim();
+
+  if (!message) {
+    alert('Та мессеж бичих шаардлагатай!');
+    return;
   }
 
   try {
-    const { msg = '', chatSlug = '', history = [], model } = req.body || {};
-    const key = process.env.OPENAI_API_KEY;
-    if (!key) return res.status(500).json({ error: 'No API key' });
-
-    const last = (history || []).slice(-10).map(m => ({
-      role: m.who === 'user' ? 'user' : 'assistant',
-      content: String(m.html || '').replace(/<[^>]+>/g, '')
-    }));
-
-    const system = `Та "Оюунсанаа" нэртэй зөвлөх. Хэрэглэгч: ${chatSlug}. Монгол хэлээр товч хариул.`;
-
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+    const response = await fetch('/api/oy-chat', {
       method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${key}`,
-        'Content-Type': 'application/json'
-      },
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model || 'gpt-3.5-turbo',  // Сонгосон model
-        temperature: 0.3,
-        messages: [
-          { role: 'system', content: system },
-          ...last,
-          { role: 'user', content: String(msg) }
-        ]
+        model,
+        msg: message,
+        chatSlug: state.current || 'default-chat', // ✅ тогтмол биш
+        history: []
       })
     });
 
-    const data = await r.json();
-    const reply = data.choices?.[0]?.message?.content || 'Алдаа гарлаа.';
-    return res.status(200).json({ reply });
+    const data = await response.json();
+    const reply = data.reply || "Хариу олдсонгүй";
 
-  } catch (e) {
-    return res.status(500).json({ error: String(e) });
+    const messageArea = document.getElementById("oyStream");
+    messageArea.innerHTML += `<div class="botMessage">${reply}</div>`;
+  } catch (error) {
+    console.error('Алдаа гарлаа:', error);
+    alert('API холболтын алдаа гарлаа.');
   }
-};
+}
