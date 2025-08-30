@@ -268,9 +268,11 @@
   // Түүх (байгаа бол) аваад явуулна
   let hist = [];
   try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
+    // товчлуурын эвент бүртгэхийг send() функцээс гадуур хийнэ
+document.getElementById("btnSend").addEventListener("click", send);
 
-  document.getElementById("btnSend").addEventListener("click", async function() {
-  const model = document.getElementById("modelSelect").value || "gpt-3.5-turbo";  // Сонгосон model эсвэл default model
+async function send() {
+  const model = document.getElementById("modelSelect").value || "gpt-3.5-turbo";
   const message = document.getElementById("oyInput").value.trim();
 
   if (!message) {
@@ -283,25 +285,23 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({
-        model: model,  // Сонгосон model
+        model,
         msg: message,
-        chatSlug: 'chat-123',  // Тохирох чат
+        chatSlug: state.current || 'default-chat', // ✅ тогтмол биш
         history: []
       })
     });
 
     const data = await response.json();
-    const reply = data.reply || 'Хариу олдсонгүй';
-    console.log(reply);
+    const reply = data.reply || "Хариу олдсонгүй";
 
-    // Хариуг UI-д харуулах
-    const messageArea = document.getElementById('oyStream');
+    const messageArea = document.getElementById("oyStream");
     messageArea.innerHTML += `<div class="botMessage">${reply}</div>`;
   } catch (error) {
     console.error('Алдаа гарлаа:', error);
     alert('API холболтын алдаа гарлаа.');
   }
-});
+}
   /* ===== Modal / Drawer ===== */
   const mqDesktop = window.matchMedia('(min-width:1024px)');
   const isDesktop = () => mqDesktop.matches;
