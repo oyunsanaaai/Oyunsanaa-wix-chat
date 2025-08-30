@@ -364,11 +364,10 @@ if (savedModel) {
     openModal();
   }
 // === Model select хадгалах ===
-document.getElementById('modelSelect')?.addEventListener('change', (e) => {
-  const model = e.target.value;
-  localStorage.setItem('oy-model', model);
-  location.reload(); // model солигдоход чат дахин ачаалагдана
-});
+const savedModel = localStorage.getItem('oy-model');
+if (savedModel) {
+  document.getElementById('modelSelect').value = savedModel;
+}
   // Wix trigger
   window.OY_OPEN = openModal;
   window.addEventListener('message', (ev)=>{
