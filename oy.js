@@ -18,7 +18,7 @@
     panel: $('#oyPanel'), pBack: $('#oyPanelBack'),
     pTitle: $('#oyPanelTitle'), pBody: $('#oyPanelBody'),
     file: $('#oyFile'),
-    modelSelect: document.querySelector('#modelSelect'), // ← НЭМЭГДСЭН
+    modelSelect: $('#modelSelect'),
   };
 
   /* ===== Data ===== */
@@ -271,12 +271,12 @@
     try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
     try {
-      // ⬇️ ШИНЭЧЛЭГДСЭН API ДУУДЛАГА - model parameter нэмэгдсэн
+      // ⬇️ ЭНЭ Л API ДУУДЛАГА (same-origin)
       const r = await fetch('/api/oy-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: el.modelSelect?.value || 'gpt-4o-mini',   // ← сонгосон model
+          model: el.modelSelect?.value || 'gpt-4o-mini',
           msg: t,
           chatSlug: state.current || '',
           history: hist
