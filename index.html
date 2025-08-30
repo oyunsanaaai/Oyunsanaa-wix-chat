@@ -8,6 +8,7 @@
   <script defer src="/oy.js?v=1"></script>
 </head>
 <body>
+  <!-- Зөвхөн энэ хэсэг үлдсэн -->
   <div id="model-picker" style="display:flex;gap:8px;align-items:center">
     <span style="font-size:14px">Model:</span>
     <select id="modelSelect">
@@ -16,9 +17,9 @@
       <option value="gpt-4o">4o</option>
     </select>
   </div>
-  
+
   <textarea id="oyInput" placeholder="Энд бичээд Enter дарна уу..."></textarea>
-  <button id="btnSend">Илгээх</button>
+  <button id="btnSend" class="oy-send" title="Илгээх">Илгээх</button>
 
   <script defer src="./scripts/oy.js"></script>
 </body>
