@@ -269,32 +269,39 @@
   let hist = [];
   try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
-  try {
-    const r = await fetch('/api/oy-chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    model: el.modelSelect?.value || "gpt-3.5-turbo",   // ← энд шинэ мөр нэмнэ
-    msg: t,
-    chatSlug: state.current || '',
-    history: hist
-  })
-});
+  document.getElementById("btnSend").addEventListener("click", async function() {
+  const model = document.getElementById("modelSelect").value || "gpt-3.5-turbo";  // Сонгосон model эсвэл default model
+  const message = document.getElementById("oyInput").value.trim();
 
-    const { reply, error } = await r.json();
-    if (error) throw new Error(error);
-
-    const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-    bubble(safe, 'bot');
-    pushMsg(state.current, 'bot', safe);
-    save();
-  } catch (e) {
-    bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
-  } finally {
-    el.send.disabled = false;
+  if (!message) {
+    alert('Та мессеж бичих шаардлагатай!');
+    return;
   }
-}
 
+  try {
+    const response = await fetch('/api/oy-chat', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: model,  // Сонгосон model
+        msg: message,
+        chatSlug: 'chat-123',  // Тохирох чат
+        history: []
+      })
+    });
+
+    const data = await response.json();
+    const reply = data.reply || 'Хариу олдсонгүй';
+    console.log(reply);
+
+    // Хариуг UI-д харуулах
+    const messageArea = document.getElementById('oyStream');
+    messageArea.innerHTML += `<div class="botMessage">${reply}</div>`;
+  } catch (error) {
+    console.error('Алдаа гарлаа:', error);
+    alert('API холболтын алдаа гарлаа.');
+  }
+});
   /* ===== Modal / Drawer ===== */
   const mqDesktop = window.matchMedia('(min-width:1024px)');
   const isDesktop = () => mqDesktop.matches;
