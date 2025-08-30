@@ -358,7 +358,12 @@
   } else {
     openModal();
   }
-
+// === Model select хадгалах ===
+document.getElementById('modelSelect')?.addEventListener('change', (e) => {
+  const model = e.target.value;
+  localStorage.setItem('oy-model', model);
+  location.reload(); // model солигдоход чат дахин ачаалагдана
+});
   // Wix trigger
   window.OY_OPEN = openModal;
   window.addEventListener('message', (ev)=>{
