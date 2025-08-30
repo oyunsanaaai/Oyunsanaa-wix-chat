@@ -18,6 +18,7 @@
     panel: $('#oyPanel'), pBack: $('#oyPanelBack'),
     pTitle: $('#oyPanelTitle'), pBody: $('#oyPanelBody'),
     file: $('#oyFile'),
+    modelSelect: document.querySelector('#modelSelect'), // ← НЭМЭГДСЭН
   };
 
   /* ===== Data ===== */
@@ -255,45 +256,46 @@
   const OY_API_BASE = ""; // жишээ: "https://oyunsanaa-wix-chat.vercel.app"
 
   async function send() {
-  const t = (el.input?.value || "").trim();
-  if (!t) { meta('Жишээ: “Сайн байна уу?”'); return; }
-  if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
+    const t = (el.input?.value || "").trim();
+    if (!t) { meta('Жишээ: "Сайн байна уу?"'); return; }
+    if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
 
-  // UI-д эхлээд харуулна
-  bubble(esc(t), 'user');
-  pushMsg(state.current, 'user', esc(t));
-  el.input.value = '';
-  el.send.disabled = true;
+    // UI-д эхлээд харуулна
+    bubble(esc(t), 'user');
+    pushMsg(state.current, 'user', esc(t));
+    el.input.value = '';
+    el.send.disabled = true;
 
-  // Түүх (байгаа бол) аваад явуулна
-  let hist = [];
-  try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
+    // Түүх (байгаа бол) аваад явуулна
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
-  try {
-    // ⬇️ ЭНЭ Л API ДУУДЛАГА (same-origin)
-    const r = await fetch('/api/oy-chat', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        msg: t,
-        chatSlug: state.current || '',
-        history: hist
-      })
-    });
+    try {
+      // ⬇️ ШИНЭЧЛЭГДСЭН API ДУУДЛАГА - model parameter нэмэгдсэн
+      const r = await fetch('/api/oy-chat', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: el.modelSelect?.value || 'gpt-4o-mini',   // ← сонгосон model
+          msg: t,
+          chatSlug: state.current || '',
+          history: hist
+        })
+      });
 
-    const { reply, error } = await r.json();
-    if (error) throw new Error(error);
+      const { reply, error } = await r.json();
+      if (error) throw new Error(error);
 
-    const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-    bubble(safe, 'bot');
-    pushMsg(state.current, 'bot', safe);
-    save();
-  } catch (e) {
-    bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
-  } finally {
-    el.send.disabled = false;
+      const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
+      bubble(safe, 'bot');
+      pushMsg(state.current, 'bot', safe);
+      save();
+    } catch (e) {
+      bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
+    } finally {
+      el.send.disabled = false;
+    }
   }
-}
 
   /* ===== Modal / Drawer ===== */
   const mqDesktop = window.matchMedia('(min-width:1024px)');
@@ -364,8 +366,3 @@
   });
 
 })();
-
-
-
-
-
