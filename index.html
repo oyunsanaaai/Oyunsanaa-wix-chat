@@ -5,9 +5,24 @@
   <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
   <title>Оюунсанаа Chat</title>
   <link rel="stylesheet" href="/oy.css?v=1">
-<script defer src="/oy.js?v=1"></script>
+  <script defer src="/oy.js?v=1"></script>
 </head>
 <body>
+  <div id="model-picker" style="display:flex;gap:8px;align-items:center">
+    <span style="font-size:14px">Model:</span>
+    <select id="modelSelect">
+      <option value="gpt-3.5-turbo">3.5</option>
+      <option value="gpt-4o-mini">4o-mini</option>
+      <option value="gpt-4o">4o</option>
+    </select>
+  </div>
+  
+  <textarea id="oyInput" placeholder="Энд бичээд Enter дарна уу..."></textarea>
+  <button id="btnSend">Илгээх</button>
+
+  <script defer src="./scripts/oy.js"></script>
+</body>
+</html>
   <!-- Overlay (зөвхөн mobile-д хэрэглэнэ) -->
   <div id="oyOverlay" class="oy-overlay" hidden></div>
 
