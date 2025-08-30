@@ -6,18 +6,20 @@
   <title>Оюунсанаа Chat</title>
   <link rel="stylesheet" href="/oy.css?v=1">
   <script defer src="/oy.js?v=1"></script></head>
+  <body>
   <select id="modelSelect">
-  <option value="gpt-3.5-turbo">3.5 : Энгийн/Хурдан</option>
-<option value="gpt-4o-mini" selected>4o-mini : Дунд</option>
-<option value="gpt-4o">4o : Гүн/Нарийн</option>
-</select>
-<body>
+    <option value="gpt-3.5-turbo">3.5 : Энгийн/Хурдан</option>
+    <option value="gpt-4o-mini" selected>4o-mini : Дунд</option>
+    <option value="gpt-4o">4o : Гүн/Нарийн</option>
+  </select>
+
   <!-- Overlay (зөвхөн mobile-д хэрэглэнэ) -->
   <div id="oyOverlay" class="oy-overlay" hidden></div>
 
   <!-- FULLSCREEN CHAT APP -->
-  <div id="oyModal" class="oy-modal" hidden role="dialog" aria-modal="true" aria-label="Чат">
-
+  <div id="oyModal" class="oy-modal" hidden role="dialog" aria-modal="true">
+    ...
+    
     <!-- Header -->
     <header class="oy-header" id="oyHeader">
       <button id="btnDrawer" class="oy-iconbtn" aria-label="Меню">
