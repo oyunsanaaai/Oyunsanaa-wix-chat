@@ -353,6 +353,11 @@
   el.input?.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
 
   // === Open immediately for preview; Wix дээр бол товчоор дуудна ===
+  // == Model localStorage-с сонгох ==
+const savedModel = localStorage.getItem('oy-model');
+if (savedModel) {
+  document.getElementById('modelSelect').value = savedModel;
+}
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', openModal);
   } else {
