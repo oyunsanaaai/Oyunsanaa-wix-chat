@@ -43,12 +43,27 @@
         <div id="itemGuides" class="oy-item" data-menu="guides">
           <span class="i">
             <svg viewBox="0 0 24 24" aria-hidden="true">
+<div id="model-picker" style="display:flex;gap:8px;align-items:center">
+  <span style="font-size:14px">Model:</span>
+  <select id="modelSelect">
+    <option value="gpt-3.5-turbo">3.5</option>
+    <option value="gpt-4o-mini">4o-mini</option>
+    <option value="gpt-4o">4o</option>
+  </select>
+</div>
               <path d="M21 15a4 4 0 0 1-4 4H8l-5 4V5a4 4 0 0 1 4-4h10a4 4 0 0 1 4 4z"/>
             </svg>
           </span>
           <span class="t"><b>Сэтгэлийн хөтөч (чатууд)</b></span>
         </div>
-
+<div id="itemExtra" class="oy-item" data-menu="extra">
+  <span class="icon">
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path d="M12 2 L15 8 L22 9 L17 14 L18 21 L12 18 L6 21 L7 14 L2 9 L9 8 Z"></path>
+    </svg>
+  </span>
+  <span>Нэмэлт хөтөлбөр</span>
+</div>
         <section id="guidesWrap" class="oy-section" hidden aria-label="Сэтгэлийн хөтөч — ангиллууд">
           <div class="guides-heading">Насны ангилал</div>
           <div id="guideCatsAge" class="oy-pills"></div>
@@ -61,7 +76,10 @@
           <div id="activeList"></div>
         </section>
       </div>
-
+<section id="extraWrap" class="oy-section" hidden>
+  <h4>Нэмэлт хөтөлбөрүүд</h4>
+  <!-- эндээс багцууд/товчлуурууд эсвэл төлбөрийн холбоосоо байрлуул -->
+</section>
       <div id="oyPanel" class="oy-panel" hidden>
         <header>
           <button id="oyPanelBack" class="oy-back">Буцах</button>
