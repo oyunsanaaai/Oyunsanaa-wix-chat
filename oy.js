@@ -5,6 +5,11 @@
 
   /* ===== Элементийн тохиргоо ===== */
   const el = {
+    const el = {
+  // ...
+  file: $('#oyFile'),
+  modelSelect: $('#modelSelect'),   // ← ЭНЭГЭЭ НЭМ
+};
     overlay: $('#oyOverlay'),
     modal: $('#oyModal'),
     drawer: $('#oyDrawer'),
@@ -107,12 +112,6 @@
       const response = await fetch('/api/oy-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: el.modelSelect.value || 'gpt-3.5-turbo',
-          msg: t,
-          chatSlug: state.current || 'default-chat', // ✅ тогтмол биш
-          history: hist
-        })
       });
 
       const data = await response.json();
@@ -125,7 +124,4 @@
       alert('API холболтын алдаа гарлаа.');
     }
   }
-
-  // Эвент сонсогчийг зөвшөөрч байна
-  document.getElementById("btnSend").addEventListener("click", send);
 })();
