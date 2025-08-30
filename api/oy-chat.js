@@ -1,4 +1,4 @@
-// api/oy-chat.js (Vercel serverless function / CommonJS)
+heddugeer muru// api/oy-chat.js (Vercel serverless function / CommonJS)
 module.exports = async (req, res) => {
   if (req.method !== 'POST') {
     res.setHeader('Allow', 'POST');
@@ -33,7 +33,15 @@ module.exports = async (req, res) => {
         ]
       })
     });
-
+body: JSON.stringify({
+  model: 'gpt-4o-mini',
+  temperature: 0.3,
+  messages: [
+    { role: 'system', content: system },
+    ...last,
+    { role: 'user', content: String(msg) }
+  ]
+})
     const data = await r.json();
     const reply = data.choices?.[0]?.message?.content || 'Алдаа гарлаа.';
     return res.status(200).json({ reply });
