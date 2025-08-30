@@ -364,6 +364,7 @@ if (savedModel) {
     openModal();
   }
 // === Model select хадгалах ===
+// Бусад хэсэгт зарлагдсан savedModel ашиглах
 const savedModel = localStorage.getItem('oy-model');
 if (savedModel) {
   document.getElementById('modelSelect').value = savedModel;
