@@ -212,65 +212,33 @@
     arr.push({t:Date.now(), who, html}); localStorage.setItem(k, JSON.stringify(arr));
   }
 
-  // ==== SEND ====
-  async function send () {
-    const t = (el.input?.value || '').trim();
-    if (!t) { meta('Жишээ: "Сайн байна уу?"'); return; }
-    if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
+ async function sendMessage() {
+  const message = userInput.value.trim();
+  if (!message) return;
 
-    bubble(esc(t), 'user');
-    pushMsg(state.current, 'user', esc(t));
-    el.input.value = '';
-    el.send.disabled = true;
+  addMessage("user", message);
+  userInput.value = "";
 
-    // History
-    let hist = [];
-    try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
+  try {
+    const response = await fetch("https://api.openai.com/v1/chat/completions", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        "Authorization": `Bearer ${API_KEY}`, // өөрийн key оруул
+      },
+      body: JSON.stringify({
+        model: "gpt-4o-mini", // энд зөв model
+        messages: [{ role: "user", content: message }],
+      }),
+    });
 
-  
-  /* ===== Modal / Drawer ===== */
-  const mqDesktop = window.matchMedia('(min-width:1024px)');
-  const isDesktop = () => mqDesktop.matches;
-
-  function openModal(){
-    el.modal.hidden=false;
-    if (!isDesktop()) el.overlay.hidden=false;
-    document.documentElement.style.height='100%';
-    document.body.style.overflow='hidden';
-    bootOnce();
-  }           try {
-            const r = await fetch(...); 
-            const { reply, error } = await r.json();
-            if (error) throw new Error(error);
-
-            const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-            bubble(safe, 'bot');
-            pushMsg(state.current, 'bot', safe);
-            save();
-        } catch (e) {
-            console.error(e);
-            bubble('⚠ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
-        } finally {
-            el.send.disabled = false;
-        }
-  mqDesktop.addEventListener?.('change', () => {
-    closeDrawer();
-    el.overlay.hidden = isDesktop() ? true : el.overlay.hidden;
-  });
-
-  function bootOnce(){
-    if (el.modal.dataset.boot) return; el.modal.dataset.boot='1';
-    el.accName.textContent=state.account.name||'Хэрэглэгч';
-    el.accCode.textContent=state.account.code||'OY-0000';
-    renderMenu(); renderAgeCats(); renderSpecialCats(); redrawActive();
-    if(state.current && state.active[state.current]){
-      el.title.textContent=`Оюунсанаа — ${state.active[state.current].name}`;
-      loadChat(state.current,false);
-    } else {
-      bubble('Сайн уу, байна уу. Сэтгэлийн хөтөчөөс ангиллаа сонгоод чат руу оръё. 🌸', 'bot');
-      meta('Тавтай морилно уу');
-    }
+    const data = await response.json();
+    const reply = data.choices?.[0]?.message?.content || "⚠️ Алдаа гарлаа!";
+    addMessage("assistant", reply);
+  } catch (error) {
+    addMessage("assistant", "⚠️ Сүлжээний алдаа: " + error.message);
   }
+}
 
   /* ===== Events (one-time attach) ===== */
   if (!window.__OY_LISTENERS__) {
