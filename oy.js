@@ -37,17 +37,17 @@
 
     console.log(`📚 История: ${processedHistory.length} мессеж`);
 
-// API дуудлага
-const response = await fetch('/api/oy-chat', {
-  method: 'POST',
-  headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
-    model: selectedModel,
-    msg: userMessage,
-    chatSlug: currentChat,
-    history: chatHistory
-  })
-});    console.log(`📊 OpenAI Response Status: ${response.status}`);
+// Function эхэнд async нэмэх
+async function send() {
+  // код...
+  
+  const response = await fetch('/api/oy-chat', {
+    // API дуудлага
+  });
+  
+  const data = await response.json();
+  // код...
+}});    console.log(`📊 OpenAI Response Status: ${response.status}`);
     
     if (!response.ok) {
       console.error('❌ OpenAI API Error:', data);
