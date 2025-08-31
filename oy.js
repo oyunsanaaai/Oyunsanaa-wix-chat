@@ -202,28 +202,73 @@
     const k=msgKey(key); const arr=JSON.parse(localStorage.getItem(k)||'[]');
     arr.push({t:Date.now(), who, html}); localStorage.setItem(k, JSON.stringify(arr));
   }
-
-// ==== SEND ====
+// ==== SEND (resilient) ====
 async function send () {
   const t = (el.input?.value || '').trim();
   if (!t) { meta('Жишээ: "Сайн байна уу?"'); return; }
   if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
 
+  // UI
   bubble(esc(t), 'user');
   pushMsg(state.current, 'user', esc(t));
   el.input.value = '';
   el.send.disabled = true;
 
+  // Түүх
   let hist = [];
   try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
+  // Моделиудын map (backend өөр нэр хүсдэг байж болно)
+  const uiModel = el.modelSelect?.value || 'gpt-4o';
+  const MODEL_MAP = {
+    'gpt-4o': 'gpt-4o',
+    'gpt-4o-mini': 'gpt-4o-mini',
+    // доор нь шаардлагатай бол нэмнэ
+  };
+  const model = MODEL_MAP[uiModel] || 'gpt-4o';
+
   try {
-    body: JSON.stringify({
-  model: el.modelSelect?.value || 'gpt-4o',
-  msg: t,
-  chatSlug: state.current || '',
-  history: hist
-})
+    // ажиллаж буй endpoint-аа олно (кэштэй)
+    const url = OY_ENDPOINT || await pickWorkingEndpoint();
+
+    // бодит хүсэлт
+    const r = await fetch(url, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model,
+        msg: t,
+        chatSlug: state.current || '',
+        history: hist
+      })
+    });
+
+    // 405/404 тохиолдолд өөр зам руу автоматаар шилжинэ
+    if (r.status === 405 || r.status === 404) {
+      // кэшийг арилгаад дахин сонгоно
+      localStorage.removeItem(OY_EP_LSKEY);
+      OY_ENDPOINT = '';
+      const fallbackUrl = await pickWorkingEndpoint();
+      const r2 = await fetch(fallbackUrl, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ model, msg: t, chatSlug: state.current || '', history: hist })
+      });
+      if (!r2.ok) {
+        const txt = await r2.text().catch(()=> '');
+        throw new Error(`API (${r2.status}) ${txt}`);
+      }
+      const { reply, error } = await r2.json();
+      if (error) throw new Error(error);
+      const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
+      bubble(safe, 'bot'); pushMsg(state.current, 'bot', safe); save();
+      return;
+    }
+
+    if (!r.ok) {
+      const txt = await r.text().catch(()=> '');
+      throw new Error(`API (${r.status}) ${txt}`);
+    }
 
     const { reply, error } = await r.json();
     if (error) throw new Error(error);
@@ -234,90 +279,8 @@ async function send () {
     save();
   } catch (e) {
     console.error(e);
-    bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
+    bubble('⚠️ Холболтын алдаа: ' + esc(niceError(e)), 'bot');
   } finally {
     el.send.disabled = false;
   }
 }
-  /* ===== Modal / Drawer ===== */
-  const mqDesktop = window.matchMedia('(min-width:1024px)');
-  const isDesktop = () => mqDesktop.matches;
-
-  function openModal(){
-    el.modal.hidden=false;
-    if (!isDesktop()) el.overlay.hidden=false;
-    document.documentElement.style.height='100%';
-    document.body.style.overflow='hidden';
-    bootOnce();
-  }
-  function closeModal(){
-    el.modal.hidden=true;
-    el.overlay.hidden=true;
-    closeDrawer();
-    document.documentElement.style.height='';
-    document.body.style.overflow='';
-    save();
-  }
-  function openDrawer(){ if (isDesktop()) return; document.body.classList.add('oy-drawer-open'); }
-  function closeDrawer(){ document.body.classList.remove('oy-drawer-open'); }
-  function toggleDrawer(){ document.body.classList.toggle('oy-drawer-open'); }
-
-  mqDesktop.addEventListener?.('change', () => { closeDrawer(); el.overlay.hidden = isDesktop() ? true : el.overlay.hidden; });
-
-  function bootOnce(){
-    if (el.modal.dataset.boot) return; el.modal.dataset.boot='1';
-    el.accName.textContent=state.account.name||'Хэрэглэгч';
-    el.accCode.textContent=state.account.code||'OY-0000';
-    renderMenu(); renderAgeCats(); renderSpecialCats(); redrawActive();
-    if(state.current && state.active[state.current]){
-      el.title.textContent=`Оюунсанаа — ${state.active[state.current].name}`;
-      loadChat(state.current,false);
-    } else {
-      bubble('Сайн уу, байна уу. Сэтгэлийн хөтөчөөс ангиллаа сонгоод чат руу оръё. 🌸', 'bot');
-      meta('Тавтай морилно уу');
-    }
-  }
-
-  /* ===== Events ===== */
-  el.overlay?.addEventListener('click', ()=>{ closeDrawer(); if(!isDesktop()) closeModal(); });
-  el.btnClose?.addEventListener('click', closeModal);
-  el.btnDrawer?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); el.guidesWrap.hidden=true; toggleDrawer(); });
-
-  document.addEventListener('click', (e)=>{
-    if(!document.body.classList.contains('oy-drawer-open')) return;
-    if(e.target.closest('#oyDrawer') || e.target.closest('#btnDrawer')) return;
-    closeDrawer();
-  });
-
-  $('#itemGuides')?.addEventListener('click', ()=>{ el.guidesWrap.hidden = !el.guidesWrap.hidden; });
-  el.send?.addEventListener('click', send);
-  el.input?.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
-
-  /* ===== Open / Triggers (robust) ===== */
-  function forceOpen(){
-    try {
-      if (!el.modal) { console.warn('oyModal not found'); return; }
-      el.modal.hidden = false;
-      el.overlay.hidden = isDesktop() ? true : false;
-      document.documentElement.style.height = '100%';
-      document.body.style.overflow = 'hidden';
-      bootOnce();
-    } catch (e) {
-      console.error('openModal failed:', e);
-    }
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', forceOpen);
-  } else {
-    forceOpen();
-  }
-
-  window.OY_OPEN = forceOpen;
-  window.addEventListener('message', (ev)=>{
-    const t = ev?.data?.type || ev?.data;
-    if (t === 'OY_OPEN') forceOpen();
-  });
-
-  setTimeout(()=>{ if (el.modal?.hidden) forceOpen(); }, 500);
-})();
