@@ -1,36 +1,47 @@
-// ⛓️ API суурь тохиргоо — олон зам туршаад, ажиллаж байгаа замыг кэшлэнэ
-const OY_HOST = 'https://chat.oyunsanaa.com';              // Vercel субдомен
-const OY_EP_CANDIDATES = [
-  '/api/oy-chat',     // хуучин зам
-  '/api/chat',        // түгээмэл
-  '/api/v1/chat',     // шинэчлэл байж магадгүй
-  '/api/openai/chat'  // өөр төсөөлөгдөх бүтэц
-].map(p => OY_HOST + p);
+// pages/api/oy-chat.js
+import OpenAI from "openai";
 
-const OY_EP_LSKEY = 'oy_best_endpoint_v1';
-let OY_ENDPOINT = localStorage.getItem(OY_EP_LSKEY) || '';
+const openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
 
-async function pickWorkingEndpoint() {
-  const bodies = { ping: true }; // lightweight body to шалгах
-  const opts = (body)=>({
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-  });
-
-  const candidates = OY_ENDPOINT ? [OY_ENDPOINT, ...OY_EP_CANDIDATES.filter(u=>u!==OY_ENDPOINT)] : OY_EP_CANDIDATES;
-
-  for (const url of candidates) {
-    try {
-      const r = await fetch(url, opts(bodies));
-      // 200–299: ok. 400: зөв method боловч буруу өгөгдөл—OK гэж үзнэ
-      if (r.status >= 200 && r.status < 300) { OY_ENDPOINT = url; localStorage.setItem(OY_EP_LSKEY, url); return url; }
-      if (r.status === 400) { OY_ENDPOINT = url; localStorage.setItem(OY_EP_LSKEY, url); return url; }
-      // 405/404 бол дараагийн замыг туршина
-    } catch(_) { /* next */ }
+export default async function handler(req, res) {
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method Not Allowed" });
   }
-  throw new Error('API endpoint олдсонгүй (405/404 эсвэл CORS).');
-}
 
-// Жижиг helper: алдаа мессежийг нэг мөр болгон гаргана
-const niceError = (e) => (e?.message || e || 'Алдаа');
+  try {
+    const { model, msg, history = [], chatSlug } = req.body || {};
+
+    const MAP = new Map([
+      ["gpt-4o", "gpt-4o"],
+      ["gpt-4o-mini", "gpt-4o-mini"],
+      ["gpt-3.5-turbo", "gpt-4o-mini"],
+    ]);
+    const resolvedModel = MAP.get(model) || "gpt-4o-mini";
+
+    const messages = [];
+    for (const m of history) {
+      const role = m.who === "user" ? "user" : "assistant";
+      const content = String(m.html ?? "").replace(/<[^>]+>/g, "");
+      messages.push({ role, content });
+    }
+    messages.push({ role: "user", content: String(msg ?? "") });
+    messages.unshift({
+      role: "system",
+      content:
+        `You are Oyunsanaa's helpful Mongolian assistant. ` +
+        (chatSlug ? `Chat slug: ${chatSlug}.` : ""),
+    });
+
+    const r = await openai.chat.completions.create({
+      model: resolvedModel,
+      messages,
+      temperature: 0.2,
+    });
+
+    const reply = r.choices?.[0]?.message?.content ?? "";
+    return res.status(200).json({ reply });
+  } catch (e) {
+    console.error("[oy-chat] server error:", e);
+    return res.status(500).json({ error: e?.message || "Server error" });
+  }
+}
