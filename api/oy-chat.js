@@ -25,10 +25,11 @@ export default async function handler(req, res) {
     }
     messages.push({ role: 'user', content: String(msg || '') });
 
-    // 3.5 ирвэл автоматаар 4o руу шилжүүлнэ (жинхэнэ 3.5 байхгүй болсон)
-    const resolvedModel = model === 'gpt-3.5-turbo' ? 'gpt-4o' : model;
+    // зөвшөөрөгдөх загварууд
+const ALLOW = ['gpt-4o', 'gpt-4o-mini'];
 
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
+// хэрэглэгчээс ирсэн model зөвшөөрөгдөөгүй бол автоматаар 4o-mini болгож сонгоно
+const resolvedModel = ALLOW.includes(model) ? model : 'gpt-4o-mini';
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
