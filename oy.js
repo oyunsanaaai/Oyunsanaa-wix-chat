@@ -9,7 +9,8 @@
   const el = {
     overlay: $('#oyOverlay'), modal: $('#oyModal'),
     ...
-    drawer: $('#oyDrawer'), menu: $('.oy-menu'),
+   drawer: $('#oyDrawer'),
+menu: $('.oy-menu'),
     menuList: $('#menuList'),
     itemGuides: $('#itemGuides'), guidesWrap: $('#guidesWrap'),
     guideCatsAge: $('#guideCatsAge'), guideCatsSpecial: $('#guideCatsSpecial'),
