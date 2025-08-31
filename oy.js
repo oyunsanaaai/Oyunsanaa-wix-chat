@@ -37,31 +37,17 @@
 
     console.log(`📚 История: ${processedHistory.length} мессеж`);
 
-    // OpenAI API дуудах
-    const response = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-        'Content-Type': 'application/json',
-        'User-Agent': 'OyunsanaaChat/1.0'
-      },
-      body: JSON.stringify({
-        model: selectedModel,
-        temperature: 0.7,
-        max_tokens: 1000,
-        messages: [
-          { 
-            role: 'system', 
-            content: 'Та Монгол хэлээр товч, эелдэг, ойлгомжтой хариулна. Хэрэглэгчийн сэтгэлийн хөтөч болж, дэмжлэг өгнө.' 
-          },
-          ...processedHistory,
-          { role: 'user', content: msg }
-        ],
-      }),
-    });
-
-    const data = await response.json();
-    
+ // API дуудлага
+const response = await fetch('/api/oy-chat', {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: selectedModel,
+    msg: userMessage,
+    chatSlug: currentChat,
+    history: chatHistory
+  })
+});
     console.log(`📊 OpenAI Response Status: ${response.status}`);
     
     if (!response.ok) {
