@@ -47,7 +47,7 @@
   const textColorFor=(hex)=>{ const c=(hex||'').replace('#',''); if(c.length<6) return '#111';
     const r=parseInt(c.slice(0,2),16), g=parseInt(c.slice(2,4),16), b=parseInt(c.slice(4,6),16);
     const L=(0.299*r+0.587*g+0.114*b)/255; return L>0.7? '#111':'#fff'; };
-  const esc=(s)=> String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[m]));
+d.className='oy-bubble '+(who==='user' ? 'oy-user' : 'oy-bot');
   function bubble(html, who='bot'){ const d=document.createElement('div'); d.className='oy-bubble '+(who==='user'?'oy-user':'oy-bot'); d.innerHTML=html;
     el.stream.appendChild(d); el.chat.scrollTop=el.chat.scrollHeight+999; return d; }
   function meta(t){ const m=document.createElement('div'); m.className='oy-meta'; m.textContent=t; el.stream.appendChild(m); }
