@@ -238,33 +238,21 @@
     document.documentElement.style.height='100%';
     document.body.style.overflow='hidden';
     bootOnce();
-  }    try {
-        const r = await fetch(...);
-        const { reply, error } = await r.json();
-        if (error) throw new Error(error);
+  }           try {
+            const r = await fetch(...); 
+            const { reply, error } = await r.json();
+            if (error) throw new Error(error);
 
-        const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-        bubble(safe, 'bot');
-        pushMsg(state.current, 'bot', safe);
-        save();
-    } catch (e) {
-        console.error(e);
-        bubble('⚠ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
-    } finally {
-        el.send.disabled = false;
-    }
-  function closeModal(){
-    el.modal.hidden=true;
-    el.overlay.hidden=true;
-    closeDrawer();
-    document.documentElement.style.height='';
-    document.body.style.overflow='';
-    save();
-  }
-  function openDrawer(){ if (isDesktop()) return; document.body.classList.add('oy-drawer-open'); }
-  function closeDrawer(){ document.body.classList.remove('oy-drawer-open'); }
-  function toggleDrawer(){ document.body.classList.toggle('oy-drawer-open'); }
-
+            const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
+            bubble(safe, 'bot');
+            pushMsg(state.current, 'bot', safe);
+            save();
+        } catch (e) {
+            console.error(e);
+            bubble('⚠ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
+        } finally {
+            el.send.disabled = false;
+        }
   mqDesktop.addEventListener?.('change', () => {
     closeDrawer();
     el.overlay.hidden = isDesktop() ? true : el.overlay.hidden;
