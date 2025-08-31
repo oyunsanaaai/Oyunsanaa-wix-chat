@@ -1,12 +1,13 @@
-// app/api/oy-chat/route.js
-export async function POST(req) {
+export default async function handler(req, res) {
+  if (req.method !== 'POST') return res.status(405).end();
+
   try {
-    const { model, msg, history = [] } = await req.json();
+    const { model, msg, history = [] } = req.body || {};
 
     const MAP = new Map([
       ['gpt-4o', 'gpt-4o'],
       ['gpt-4o-mini', 'gpt-4o-mini'],
-      ['gpt-3.5-turbo', 'gpt-4o'], // 3.5 ирвэл шууд 4o
+      ['gpt-3.5-turbo', 'gpt-4o'],
     ]);
     const resolvedModel = MAP.get(model) || 'gpt-4o';
 
@@ -25,18 +26,11 @@ export async function POST(req) {
     });
 
     const data = await r.json();
-    if (!r.ok) {
-      return new Response(JSON.stringify({ error: data?.error?.message || 'OpenAI API error' }), { status: r.status });
-    }
+    if (!r.ok) return res.status(r.status).json({ error: data?.error?.message || 'OpenAI API error' });
 
     const reply = data?.choices?.[0]?.message?.content || '';
-    return Response.json({ reply });
+    res.status(200).json({ reply });
   } catch (e) {
-    return new Response(JSON.stringify({ error: e.message || 'Server error' }), { status: 500 });
+    res.status(500).json({ error: e.message || 'Server error' });
   }
-}
-
-// (Сануулахад GET → 405 буцаавал OK)
-export async function GET() {
-  return new Response('Method Not Allowed', { status: 405 });
 }
