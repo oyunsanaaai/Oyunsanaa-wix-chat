@@ -227,50 +227,7 @@
     let hist = [];
     try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
-    try {
-      const r = await fetch(`${OY_API_BASE}/api/oy-chat`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: el.modelSelect?.value || 'gpt-4o-mini',
-          msg: t,
-          chatSlug: state.current || '',
-          history: hist
-        })
-      });
-
-      const { reply, error } = await r.json();
-      if (error) throw new Error(error);
-
-      const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-      bubble(safe, 'bot');
-      pushMsg(state.current, 'bot', safe);
-      save();
-     try {
-  const raw = await r.text();
-  console.log("RAW RESPONSE:", raw);
-
-  let reply, error;
-  try {
-    const json = JSON.parse(raw);
-    reply = json.reply;
-    error = json.error;
-  } catch (e) {
-    error = raw; // JSON биш бол тэрийг алдаа болгож үзнэ
-  }
-
-  if (error) throw new Error(error);
-
-  const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-  bubble(safe, 'bot');
-  pushMsg(state.current, 'bot', safe);
-  save();
-} catch (e) {
-  console.error(e);
-  bubble('^ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
-} finally {
-  el.send.disabled = false;
-}
+  
   /* ===== Modal / Drawer ===== */
   const mqDesktop = window.matchMedia('(min-width:1024px)');
   const isDesktop = () => mqDesktop.matches;
@@ -281,7 +238,21 @@
     document.documentElement.style.height='100%';
     document.body.style.overflow='hidden';
     bootOnce();
-  }
+  }    try {
+        const r = await fetch(...);
+        const { reply, error } = await r.json();
+        if (error) throw new Error(error);
+
+        const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
+        bubble(safe, 'bot');
+        pushMsg(state.current, 'bot', safe);
+        save();
+    } catch (e) {
+        console.error(e);
+        bubble('⚠ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
+    } finally {
+        el.send.disabled = false;
+    }
   function closeModal(){
     el.modal.hidden=true;
     el.overlay.hidden=true;
