@@ -217,27 +217,31 @@
     try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
     try {
-      - fetch('/api/oy-chat', {
-+ fetch(`${OY_API_BASE}/api/oy-chat`, {
+     
+try {
+  const r = await fetch(`${OY_API_BASE}/api/oy-chat`, {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({...})
-})
+    body: JSON.stringify({
+      model: el.modelSelect?.value || 'gpt-4o-mini',
+      msg: t,
+      chatSlug: state.current || '',
+      history: hist
+    })
+  });
 
-      const { reply, error } = await r.json();
-      if (error) throw new Error(error);
+  const { reply, error } = await r.json();
+  if (error) throw new Error(error);
 
-      const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-      bubble(safe, 'bot');
-      pushMsg(state.current, 'bot', safe);
-      save();
-    } catch (e) {
-      bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
-    } finally {
-      el.send.disabled = false;
-    }
-  }
-
+  const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
+  bubble(safe, 'bot');
+  pushMsg(state.current, 'bot', safe);
+  save();
+} catch (e) {
+  bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
+} finally {
+  el.send.disabled = false;
+}
   /* ===== Modal / Drawer ===== */
   const mqDesktop = window.matchMedia('(min-width:1024px)');
   const isDesktop = () => mqDesktop.matches;
