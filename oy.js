@@ -1,36 +1,43 @@
 (()=> {
-  if (window.__OY_BOOTED__) return; 
+  // ——— Guard: нэг удаа л ачааллуулна
+  if (window.__OY_BOOTED__) return;
   window.__OY_BOOTED__ = true;
+
   const $ = (s, r=document) => r.querySelector(s);
 
-  // ⛓️ API серверийн үндсэн URL зөвхөн энд зарлана
+  // ⛓️ API серверийн үндсэн URL — зөвхөн энд
   const OY_API_BASE = 'https://chat.oyunsanaa.com';
 
   /* ===== Elements ===== */
   const el = {
-    overlay: $('#oyOverlay'), 
-    modal: $('#oyModal'),
-    drawer: $('#oyDrawer'), 
-    menu: $('.oy-menu'),
-    menuList: $('#menuList'),
+    overlay:   $('#oyOverlay'),
+    modal:     $('#oyModal'),
+    drawer:    $('#oyDrawer'),
+    menu:      $('.oy-menu'),
+    menuList:  $('#menuList'),
     itemGuides: $('#itemGuides'), guidesWrap: $('#guidesWrap'),
     guideCatsAge: $('#guideCatsAge'), guideCatsSpecial: $('#guideCatsSpecial'),
     activeList: $('#activeList'),
-    title: $('#chatTitle'),
-    chat: $('#oyChat'), stream: $('#oyStream'),
-    input: $('#oyInput'), send: $('#btnSend'),
+    title:     $('#chatTitle'),
+    chat:      $('#oyChat'), stream: $('#oyStream'),
+    input:     $('#oyInput'), send: $('#btnSend'),
     btnDrawer: $('#btnDrawer'), btnClose: $('#btnClose'),
-    accName: $('#accName'), accCode: $('#accCode'),
-    panel: $('#oyPanel'), pBack: $('#oyPanelBack'),
-    pTitle: $('#oyPanelTitle'), pBody: $('#oyPanelBody'),
-    file: $('#oyFile'),
+    accName:   $('#accName'), accCode: $('#accCode'),
+    panel:     $('#oyPanel'), pBack: $('#oyPanelBack'),
+    pTitle:    $('#oyPanelTitle'), pBody: $('#oyPanelBody'),
+    file:      $('#oyFile'),
     modelSelect: $('#modelSelect'),
   };
 
   /* ===== Store ===== */
-  const LSKEY='oy_state_v10'; const msgKey = k=>'oy_msgs_'+k;
+  const LSKEY='oy_state_v10';
+  const msgKey = k => 'oy_msgs_'+k;
+
   let state = { account:{name:'Хэрэглэгч', code:'OY-0000'}, current:null, active:{} };
-  try { const s=JSON.parse(localStorage.getItem(LSKEY)||'null'); if(s) state={...state,...s}; } catch(_){}
+  try {
+    const s = JSON.parse(localStorage.getItem(LSKEY) || 'null');
+    if (s) state = { ...state, ...s };
+  } catch(_) {}
   const save = () => localStorage.setItem(LSKEY, JSON.stringify(state));
 
   /* ===== Helpers ===== */
@@ -51,7 +58,7 @@
     const d = document.createElement('div');
     d.className = 'oy-bubble ' + (who === 'user' ? 'oy-user' : 'oy-bot');
     d.innerHTML = html;
-    el.stream.appendChild(d);
+    el.stream?.appendChild(d);
     if (el.chat) el.chat.scrollTop = el.chat.scrollHeight + 999;
     return d;
   };
@@ -60,10 +67,10 @@
     const m = document.createElement('div');
     m.className = 'oy-meta';
     m.textContent = t;
-    el.stream.appendChild(m);
+    el.stream?.appendChild(m);
   };
 
-  /* ===== Icons ===== */
+  /* ===== Icons/Data (хураангуй) ===== */
   const ICONS = {
     user:'<circle cx="12" cy="8" r="4"></circle><path d="M4 20c0-3.3 3.6-6 8-6s8 2.7 8 6"></path>',
     chart:'<path d="M4 20V10"></path><path d="M10 20V4"></path><path d="M16 20v-7"></path><path d="M2 20h20"></path>',
@@ -77,13 +84,12 @@
   };
   const iconSvg = (name)=>`<svg viewBox="0 0 24 24" aria-hidden="true">${ICONS[name]||ICONS.user}</svg>`;
 
-  /* ===== Data ===== */
   const AGE = [
     {slug:'age-0-7',  name:'Бага балчир үе (0–7)',           color:'#E1D9C9'},
     {slug:'age-8-12', name:'Адтай бяцхан үе (8–12)',         color:'#AE9372'},
     {slug:'age-13-18',name:'Сэргэлэн өсвөр үе (13–18)',      color:'#B27D57'},
     {slug:'age-19-25',name:'Эхлэл, мөрөөдлийн үе (19–25)',  color:'#7F4B30'},
-    {slug:'age-26-40',name:'Эрх чөлөөт, эрч хүчтэй үе (26–40)', color:'#A28776'},
+    {slug:'age-26-40',name:'Эрч хүчтэй үе (26–40)',          color:'#A28776'},
     {slug:'age-41-55',name:'Туршлага, бүтээлийн үе (41–55)', color:'#7D8769'},
     {slug:'age-56-70',name:'Ухаан, нөлөөллийн үе (56–70)',  color:'#424C21'},
     {slug:'age-70p',  name:'Өвлөж, үлдээх үе (70+)',         color:'#173125'},
@@ -96,17 +102,16 @@
   /* ===== Menu / Panels (placeholder) ===== */
   const Panels = {
     registry:{
-      account:{ title:'Миний бүртгэл', render:(w)=>{ w.innerHTML=`
-        <div class="card"><b>Суурь мэдээлэл</b><div class="muted">Нэр, Код нь бүртгэлээс автоматаар орно.</div></div>
-      `; } },
-      summary:{ title:'Таны сонголт', render:(w)=> w.innerHTML=`<div class="card"><b>Хураангуй</b></div>` },
-      goals:{ title:'Амьдралын зорилго', render:(w)=> w.innerHTML=`<div class="card"><b>Зорилго</b></div>` },
-      journal:{ title:'Сэтгэлийн дэвтэр', render:(w)=> w.innerHTML=`<div class="card"><b>Журнал</b></div>` },
-      edu:{ title:'Сэтгэлийн боловсрол', render:(w)=> w.innerHTML=`<div class="card"><b>Хичээлүүд</b></div>` },
-      health:{ title:'Эрүүл мэнд', render:(w)=> w.innerHTML=`<div class="card"><b>Дадал</b></div>` },
-      finance:{ title:'Санхүү', render:(w)=> w.innerHTML=`<div class="card"><b>Орлого/Зарлага</b></div>` },
-      reminders:{ title:'Сануулга', render:(w)=> w.innerHTML=`<div class="card"><b>Календарь</b></div>` },
-      programs:{ title:'Нэмэлт хөтөч', render:(w)=> w.innerHTML=`<div class="card"><b>Хөтөлбөрүүд</b></div>` },
+      account:{ title:'Миний бүртгэл', render:(w)=>{ w.innerHTML=
+        `<div class="card"><b>Суурь мэдээлэл</b><div class="muted">Нэр, Код нь бүртгэлээс автоматаар орно.</div></div>`; } },
+      summary:{  title:'Таны сонголт',       render:(w)=> w.innerHTML=`<div class="card"><b>Хураангуй</b></div>` },
+      goals:{    title:'Амьдралын зорилго',  render:(w)=> w.innerHTML=`<div class="card"><b>Зорилго</b></div>` },
+      journal:{  title:'Сэтгэлийн дэвтэр',   render:(w)=> w.innerHTML=`<div class="card"><b>Журнал</b></div>` },
+      edu:{      title:'Сэтгэлийн боловсрол',render:(w)=> w.innerHTML=`<div class="card"><b>Хичээлүүд</b></div>` },
+      health:{   title:'Эрүүл мэнд',         render:(w)=> w.innerHTML=`<div class="card"><b>Дадал</b></div>` },
+      finance:{  title:'Санхүү',             render:(w)=> w.innerHTML=`<div class="card"><b>Орлого/Зарлага</b></div>` },
+      reminders:{title:'Сануулга',           render:(w)=> w.innerHTML=`<div class="card"><b>Календарь</b></div>` },
+      programs:{ title:'Нэмэлт хөтөч',       render:(w)=> w.innerHTML=`<div class="card"><b>Хөтөлбөрүүд</b></div>` },
     },
     open(key){
       const def = this.registry[key]; if (!def) return;
@@ -123,7 +128,7 @@
     {key:'goals',     title:'Амьдралын зорилго',    icon:'target'},
     {key:'journal',   title:'Сэтгэлийн дэвтэр',     icon:'book'},
     {key:'edu',       title:'Сэтгэлийн боловсрол',  icon:'school'},
-    {key:'health',    title:'Эрүүл мэнд',          icon:'gym'},
+    {key:'health',    title:'Эрүүл мэнд',           icon:'gym'},
     {key:'reminders', title:'Сануулга',             icon:'clock'},
     {key:'programs',  title:'Нэмэлт хөтөч',         icon:'planet'},
   ];
@@ -132,7 +137,7 @@
     let list = $('#menuList');
     if(!list){
       list = document.createElement('div'); list.id = 'menuList';
-      if ($('#itemGuides')) el.menu.insertBefore(list, $('#itemGuides')); else el.menu.appendChild(list);
+      if ($('#itemGuides')) el.menu?.insertBefore(list, $('#itemGuides')); else el.menu?.appendChild(list);
     }
     list.innerHTML = '';
     MENU_ITEMS.forEach(m=>{
@@ -165,6 +170,7 @@
       el.guideCatsSpecial.appendChild(pill);
     });
   }
+
   function selectChat(it){
     const key = it.slug;
     state.current = key;
@@ -174,6 +180,7 @@
     closeDrawer();
     loadChat(key, true);
   }
+
   function redrawActive(){
     el.activeList.innerHTML = '';
     Object.entries(state.active).forEach(([key, m]) => {
@@ -190,7 +197,7 @@
     });
   }
 
-  /* ===== Chat ===== */
+  /* ===== Chat (load/persist) ===== */
   function loadChat(key,greet){
     el.stream.innerHTML='';
     const raw=localStorage.getItem(msgKey(key));
@@ -198,89 +205,141 @@
     else if(greet){ bubble('Сайн уу. Чат эхэллээ. 🌿','bot'); meta('Тавтай морилно уу'); }
     setTimeout(()=>el.input && el.input.focus(),30);
   }
+
   function pushMsg(key, who, html){
-    const k=msgKey(key); const arr=JSON.parse(localStorage.getItem(k)||'[]');
+    const k=msgKey(key);
+    const arr=JSON.parse(localStorage.getItem(k)||'[]');
     arr.push({t:Date.now(), who, html}); localStorage.setItem(k, JSON.stringify(arr));
   }
-// ==== SEND (resilient) ====
-async function send () {
-  const t = (el.input?.value || '').trim();
-  if (!t) { meta('Жишээ: "Сайн байна уу?"'); return; }
-  if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
 
-  // UI
-  bubble(esc(t), 'user');
-  pushMsg(state.current, 'user', esc(t));
-  el.input.value = '';
-  el.send.disabled = true;
+  // ==== SEND ====
+  async function send () {
+    const t = (el.input?.value || '').trim();
+    if (!t) { meta('Жишээ: "Сайн байна уу?"'); return; }
+    if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
 
-  // Түүх
-  let hist = [];
-  try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
+    bubble(esc(t), 'user');
+    pushMsg(state.current, 'user', esc(t));
+    el.input.value = '';
+    el.send.disabled = true;
 
-  // Моделиудын map (backend өөр нэр хүсдэг байж болно)
-  const uiModel = el.modelSelect?.value || 'gpt-4o';
-  const MODEL_MAP = {
-    'gpt-4o': 'gpt-4o',
-    'gpt-4o-mini': 'gpt-4o-mini',
-    // доор нь шаардлагатай бол нэмнэ
-  };
-  const model = MODEL_MAP[uiModel] || 'gpt-4o';
+    // History
+    let hist = [];
+    try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
-  try {
-    // ажиллаж буй endpoint-аа олно (кэштэй)
-    const url = OY_ENDPOINT || await pickWorkingEndpoint();
-
-    // бодит хүсэлт
-    const r = await fetch(url, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        model,
-        msg: t,
-        chatSlug: state.current || '',
-        history: hist
-      })
-    });
-
-    // 405/404 тохиолдолд өөр зам руу автоматаар шилжинэ
-    if (r.status === 405 || r.status === 404) {
-      // кэшийг арилгаад дахин сонгоно
-      localStorage.removeItem(OY_EP_LSKEY);
-      OY_ENDPOINT = '';
-      const fallbackUrl = await pickWorkingEndpoint();
-      const r2 = await fetch(fallbackUrl, {
+    try {
+      const r = await fetch(`${OY_API_BASE}/api/oy-chat`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ model, msg: t, chatSlug: state.current || '', history: hist })
+        body: JSON.stringify({
+          model: el.modelSelect?.value || 'gpt-4o-mini',
+          msg: t,
+          chatSlug: state.current || '',
+          history: hist
+        })
       });
-      if (!r2.ok) {
-        const txt = await r2.text().catch(()=> '');
-        throw new Error(`API (${r2.status}) ${txt}`);
-      }
-      const { reply, error } = await r2.json();
+
+      const { reply, error } = await r.json();
       if (error) throw new Error(error);
+
       const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-      bubble(safe, 'bot'); pushMsg(state.current, 'bot', safe); save();
-      return;
+      bubble(safe, 'bot');
+      pushMsg(state.current, 'bot', safe);
+      save();
+    } catch (e) {
+      console.error(e);
+      bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
+    } finally {
+      el.send.disabled = false;
     }
-
-    if (!r.ok) {
-      const txt = await r.text().catch(()=> '');
-      throw new Error(`API (${r.status}) ${txt}`);
-    }
-
-    const { reply, error } = await r.json();
-    if (error) throw new Error(error);
-
-    const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
-    bubble(safe, 'bot');
-    pushMsg(state.current, 'bot', safe);
-    save();
-  } catch (e) {
-    console.error(e);
-    bubble('⚠️ Холболтын алдаа: ' + esc(niceError(e)), 'bot');
-  } finally {
-    el.send.disabled = false;
   }
-}
+
+  /* ===== Modal / Drawer ===== */
+  const mqDesktop = window.matchMedia('(min-width:1024px)');
+  const isDesktop = () => mqDesktop.matches;
+
+  function openModal(){
+    el.modal.hidden=false;
+    if (!isDesktop()) el.overlay.hidden=false;
+    document.documentElement.style.height='100%';
+    document.body.style.overflow='hidden';
+    bootOnce();
+  }
+  function closeModal(){
+    el.modal.hidden=true;
+    el.overlay.hidden=true;
+    closeDrawer();
+    document.documentElement.style.height='';
+    document.body.style.overflow='';
+    save();
+  }
+  function openDrawer(){ if (isDesktop()) return; document.body.classList.add('oy-drawer-open'); }
+  function closeDrawer(){ document.body.classList.remove('oy-drawer-open'); }
+  function toggleDrawer(){ document.body.classList.toggle('oy-drawer-open'); }
+
+  mqDesktop.addEventListener?.('change', () => {
+    closeDrawer();
+    el.overlay.hidden = isDesktop() ? true : el.overlay.hidden;
+  });
+
+  function bootOnce(){
+    if (el.modal.dataset.boot) return; el.modal.dataset.boot='1';
+    el.accName.textContent=state.account.name||'Хэрэглэгч';
+    el.accCode.textContent=state.account.code||'OY-0000';
+    renderMenu(); renderAgeCats(); renderSpecialCats(); redrawActive();
+    if(state.current && state.active[state.current]){
+      el.title.textContent=`Оюунсанаа — ${state.active[state.current].name}`;
+      loadChat(state.current,false);
+    } else {
+      bubble('Сайн уу, байна уу. Сэтгэлийн хөтөчөөс ангиллаа сонгоод чат руу оръё. 🌸', 'bot');
+      meta('Тавтай морилно уу');
+    }
+  }
+
+  /* ===== Events (one-time attach) ===== */
+  if (!window.__OY_LISTENERS__) {
+    window.__OY_LISTENERS__ = true;
+
+    el.overlay?.addEventListener('click', ()=>{ closeDrawer(); if(!isDesktop()) closeModal(); });
+    el.btnClose?.addEventListener('click', closeModal);
+    el.btnDrawer?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); el.guidesWrap.hidden=true; toggleDrawer(); });
+
+    document.addEventListener('click', (e)=>{
+      if(!document.body.classList.contains('oy-drawer-open')) return;
+      if(e.target.closest('#oyDrawer') || e.target.closest('#btnDrawer')) return;
+      closeDrawer();
+    });
+
+    $('#itemGuides')?.addEventListener('click', ()=>{ el.guidesWrap.hidden = !el.guidesWrap.hidden; });
+    el.send?.addEventListener('click', send);
+    el.input?.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
+  }
+
+  /* ===== Open / Triggers ===== */
+  function forceOpen(){
+    try {
+      if (!el.modal) { console.warn('oyModal not found'); return; }
+      el.modal.hidden = false;
+      el.overlay.hidden = isDesktop() ? true : false;
+      document.documentElement.style.height = '100%';
+      document.body.style.overflow = 'hidden';
+      bootOnce();
+    } catch (e) {
+      console.error('openModal failed:', e);
+    }
+  }
+
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', forceOpen);
+  } else {
+    forceOpen();
+  }
+
+  window.OY_OPEN = forceOpen;
+  window.addEventListener('message', (ev)=>{
+    const t = ev?.data?.type || ev?.data;
+    if (t === 'OY_OPEN') forceOpen();
+  });
+
+  setTimeout(()=>{ if (el.modal?.hidden) forceOpen(); }, 500);
+})();
