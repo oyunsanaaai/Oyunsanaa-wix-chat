@@ -23,18 +23,16 @@ const resolvedModel = MAP.get(model) || 'gpt-4o';
     }
     messages.push({ role: 'user', content: String(msg || '') });
 
-    const r = await fetch('https://api.openai.com/v1/chat/completions', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': `Bearer ${process.env.OPENAI_API_KEY}`,
-      },
-      body: JSON.stringify({
-        model: resolvedModel,          // ✅ зөв model л явна
-        messages,
-        temperature: 0.7,
-      }),
-    });
+    const r = await fetch(`${OY_API_BASE}/api/oy-chat`, {
+  method: 'POST',
+  headers: { 'Content-Type': 'application/json' },
+  body: JSON.stringify({
+    model: el.modelSelect?.value || 'gpt-4o-mini',
+    msg: t,
+    chatSlug: state.current || '',
+    history: hist
+  })
+});
 
     const data = await r.json();
     if (!r.ok) {
