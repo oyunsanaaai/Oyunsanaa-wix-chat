@@ -246,14 +246,31 @@
       bubble(safe, 'bot');
       pushMsg(state.current, 'bot', safe);
       save();
-    } catch (e) {
-      console.error(e);
-      bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
-    } finally {
-      el.send.disabled = false;
-    }
+    } try {
+  const raw = await r.text();
+  console.log("RAW RESPONSE:", raw);
+
+  let reply, error;
+  try {
+    const json = JSON.parse(raw);
+    reply = json.reply;
+    error = json.error;
+  } catch (e) {
+    error = raw; // JSON биш бол тэрийг алдаа болгож үзнэ
   }
 
+  if (error) throw new Error(error);
+
+  const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
+  bubble(safe, 'bot');
+  pushMsg(state.current, 'bot', safe);
+  save();
+} catch (e) {
+  console.error(e);
+  bubble('^ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
+} finally {
+  el.send.disabled = false;
+}
   /* ===== Modal / Drawer ===== */
   const mqDesktop = window.matchMedia('(min-width:1024px)');
   const isDesktop = () => mqDesktop.matches;
