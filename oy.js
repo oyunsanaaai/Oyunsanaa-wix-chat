@@ -276,7 +276,11 @@
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: (['gpt-4o','gpt-4o-mini'].includes(el.modelSelect?.value) ? el.modelSelect.value : 'gpt-4o'),
+          model: (
+  ['gpt-4o','gpt-4o-mini'].includes(el.modelSelect?.value)
+    ? el.modelSelect.value
+    : 'gpt-4o'
+),
           chatSlug: state.current || '',
           history: hist
         })
