@@ -246,7 +246,7 @@
       bubble(safe, 'bot');
       pushMsg(state.current, 'bot', safe);
       save();
-    } try {
+     try {
   const raw = await r.text();
   console.log("RAW RESPONSE:", raw);
 
