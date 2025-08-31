@@ -217,16 +217,12 @@
     try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
     try {
-      const r = await fetch('/api/oy-chat', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          model: (['gpt-4o','gpt-4o-mini'].includes(el.modelSelect?.value) ? el.modelSelect.value : 'gpt-4o'),
-          msg: t,
-          chatSlug: state.current || '',
-          history: hist
-        })
-      });
+      - fetch('/api/oy-chat', {
++ fetch(`${OY_API_BASE}/api/oy-chat`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({...})
+})
 
       const { reply, error } = await r.json();
       if (error) throw new Error(error);
