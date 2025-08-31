@@ -45,33 +45,12 @@
 
   /* ===== Helpers ===== */
   const textColorFor=(hex)=>{ const c=(hex||'').replace('#',''); if(c.length<6) return '#111';
-/* ===== Helpers ===== */
-const textColorFor = (hex) => {
-  const c = (hex || '').replace('#','');
-  if (c.length < 6) return '#111';
-  const r = parseInt(c.slice(0,2),16),
-        g = parseInt(c.slice(2,4),16),
-        b = parseInt(c.slice(4,6),16);
-  const L = (0.299*r + 0.587*g + 0.114*b) / 255;
-  return L > 0.7 ? '#111' : '#fff';
-}; // ← энэ ; заавал байх ёстой
-
-const bubble = (html, who = 'bot') => {
-  const d = document.createElement('div');
-  d.className = 'oy-bubble ' + (who === 'user' ? 'oy-user' : 'oy-bot');
-  d.innerHTML = html;
-  el.stream.appendChild(d);
-  if (el.chat) el.chat.scrollTop = el.chat.scrollHeight + 999;
-  return d;
-}; // ← хаалт + ;
-
-const meta = (t) => {
-  const m = document.createElement('div');
-  m.className = 'oy-meta';
-  m.textContent = t;
-  el.stream.appendChild(m);
-}; // ← хаалт + ;
-/* ===== Icons ===== */
+    const r=parseInt(c.slice(0,2),16), g=parseInt(c.slice(2,4),16), b=parseInt(c.slice(4,6),16);
+    const L=(0.299*r+0.587*g+0.114*b)/255; return L>0.7? '#111':'#fff'; };
+  const esc=(s)=> String(s).replace(/[&<>"']/g, m=>({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;','\'':'&#39;' }[m]));
+  function bubble(html, who='bot'){ const d=document.createElement('div'); d.className='oy-bubble '+(who==='user'?'oy-user':'oy-bot'); d.innerHTML=html;
+    el.stream.appendChild(d); el.chat.scrollTop=el.chat.scrollHeight+999; return d; }
+  function meta(t){ const m=document.createElement('div'); m.className='oy-meta'; m.textContent=t; el.stream.appendChild(m); }
 
   /* ===== Icons ===== */
   const ICONS = {
@@ -273,7 +252,9 @@ const meta = (t) => {
     arr.push({t:Date.now(), who, html}); localStorage.setItem(k, JSON.stringify(arr));
   }
 
-  // --- API дуудлага ---
+  // --- REAL API (дараа нь өөрийн endpoint-оо солино) ---
+  const OY_API_BASE = ""; // жишээ: "https://oyunsanaa-wix-chat.vercel.app"
+
   async function send() {
     const t = (el.input?.value || "").trim();
     if (!t) { meta('Жишээ: "Сайн байна уу?"'); return; }
@@ -290,31 +271,25 @@ const meta = (t) => {
     try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
     try {
-      const response = await fetch('/api/oy-chat', {
+      // ⬇️ ЭНЭ Л API ДУУДЛАГА (same-origin)
+      const r = await fetch('/api/oy-chat', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          model: el.modelSelect?.value || 'gpt-4o-mini',
-          msg: t,
+          model: (['gpt-4o','gpt-4o-mini'].includes(el.modelSelect?.value) ? el.modelSelect.value : 'gpt-4o'),
           chatSlug: state.current || '',
           history: hist
         })
       });
 
-      const data = await response.json();
-      
-      if (!response.ok) {
-        throw new Error(data.error || 'API алдаа');
-      }
+      const { reply, error } = await r.json();
+      if (error) throw new Error(error);
 
-      const reply = data.reply || 'Хариу олдсонгүй.';
-      const safe = esc(reply);
+      const safe = esc(reply || 'Одоохондоо хариу олдсонгүй.');
       bubble(safe, 'bot');
       pushMsg(state.current, 'bot', safe);
       save();
-      
-    } catch (error) {
-      console.error('API Error:', error);
+    } catch (e) {
       bubble('⚠️ Холболтын алдаа эсвэл API тохиргоо дутуу байна.', 'bot');
     } finally {
       el.send.disabled = false;
@@ -361,38 +336,51 @@ const meta = (t) => {
     }
   }
 
-  /* ===== Events ===== */
-  el.overlay?.addEventListener('click', ()=>{ closeDrawer(); if(!isDesktop()) closeModal(); });
-  el.btnClose?.addEventListener('click', closeModal);
-  el.btnDrawer?.addEventListener('click', (e)=>{ e.preventDefault(); e.stopPropagation(); el.guidesWrap.hidden=true; toggleDrawer(); });
+ /* ===== Events ===== */
+el.overlay?.addEventListener('click', () => {
+  closeDrawer();
+  if (!isDesktop()) closeModal();
+});
+el.btnClose?.addEventListener('click', closeModal);
+el.btnDrawer?.addEventListener('click', (e) => {
+  e.preventDefault();
+  e.stopPropagation();
+  el.guidesWrap.hidden = true;
+  toggleDrawer();
+});
 
-  document.addEventListener('click', (e)=>{
-    if(!document.body.classList.contains('oy-drawer-open')) return;
-    if(e.target.closest('#oyDrawer') || e.target.closest('#btnDrawer')) return;
-    closeDrawer();
-  });
+document.addEventListener('click', (e) => {
+  if (!document.body.classList.contains('oy-drawer-open')) return;
+  if (e.target.closest('#oyDrawer') || e.target.closest('#btnDrawer')) return;
+  closeDrawer();
+});
 
-  $('#itemGuides')?.addEventListener('click', ()=>{ el.guidesWrap.hidden = !el.guidesWrap.hidden; });
-  el.send?.addEventListener('click', send);
-  el.input?.addEventListener('keydown', e=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); }});
+document.getElementById('itemGuides')?.addEventListener('click', () => {
+  el.guidesWrap.hidden = !el.guidesWrap.hidden;
+});
 
-  // === Open immediately for preview; Wix дээр бол товчоор дуудна ===
+el.send?.addEventListener('click', send);
+el.input?.addEventListener('keydown', (e) => {
+  if (e.key === 'Enter' && !e.shiftKey) { e.preventDefault(); send(); }
+});
 
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', openModal);
-  } else {
-    openModal();
-  }
-// === Model select хадгалах ===
-// Бусад хэсэгт зарлагдсан savedModel ашиглах
-const savedModel = localStorage.getItem('oy-model');
-if (savedModel) {
-  document.getElementById('modelSelect').value = savedModel;
+/* === Open immediately for preview; Wix дээр товчоор дуудна === */
+if (document.readyState === 'loading') {
+  document.addEventListener('DOMContentLoaded', openModal);
+} else {
+  openModal();
 }
-  // Wix trigger
-  window.OY_OPEN = openModal;
-  window.addEventListener('message', (ev)=>{
-    if (ev?.data?.type === 'OY_OPEN' || ev.data === 'OY_OPEN') openModal();
-  });
 
+/* === (Хуучин savedModel сэргээх блокийг БҮҮ ТАВЬ) === */
+
+/* Wix trigger */
+window.OY_OPEN = openModal;
+window.addEventListener('message', (ev) => {
+  const t = ev?.data?.type || ev?.data;
+  if (t === 'OY_OPEN') openModal();
+});
+
+/* ===== END IIFE ===== */
 })();
+
+
