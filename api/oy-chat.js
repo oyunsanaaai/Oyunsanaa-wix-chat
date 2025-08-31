@@ -4,19 +4,12 @@ export default async function handler(req, res) {
   try {
     let { model, msg, history = [] } = req.body || {};
 
-    // ✅ Зөвшөөрөгдсөн 2 модель + буруу нэршлийн map
-    const MAP = new Map([
-      ['gpt-4o', 'gpt-4o'],
-      ['gpt-4o-mini', 'gpt-4o-mini'],
-      ['gpt-4.0', 'gpt-4o'],           // алдаатай ирвэл засна
-      ['gpt-4.0-mini', 'gpt-4o-mini'], // алдаатай ирвэл засна
-      ['gpt-3.5-turbo', 'gpt-4o'],     // 3.5 ирвэл шууд 4o руу
-      [undefined, 'gpt-4o'],
-      [null, 'gpt-4o'],
-      ['', 'gpt-4o'],
-    ]);
-    const resolvedModel = MAP.get(model) || 'gpt-4o';
-
+   const MAP = new Map([
+  ['gpt-4o', 'gpt-4o'],
+  ['gpt-4o-mini', 'gpt-4o-mini'],
+  ['gpt-3.5-turbo', 'gpt-4o'],  // ⚠️ 3.5 ирвэл шууд 4o болгож байна
+]);
+const resolvedModel = MAP.get(model) || 'gpt-4o';
     // 🔎 Лог (Vercel Logs-д харагдана)
     console.log('[oy-chat] model:', model, '->', resolvedModel);
 
