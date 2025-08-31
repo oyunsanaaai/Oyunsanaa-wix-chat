@@ -10,14 +10,6 @@
     
     console.log(`🔥 API Request - Model: ${model}, Chat: ${chatSlug}, Message: ${msg.substring(0, 50)}...`);
     
-    // API key шалгах
-    if (!process.env.OPENAI_API_KEY) {
-      console.log('⚠️ OPENAI_API_KEY тохируулаагүй байна');
-      return res.status(200).json({
-        reply: `⚠️ API key тохируулаагүй. Vercel dashboard → Settings → Environment Variables → OPENAI_API_KEY нэмнэ үү.`,
-      });
-    }
-
     // Model нэр шалгаад засварлах
     const validModels = {
       'gpt-3.5-turbo': 'gpt-3.5-turbo',
