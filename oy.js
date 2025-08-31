@@ -47,7 +47,8 @@ async function send() {
   
   const data = await response.json();
   // код...
-}});    console.log(`📊 OpenAI Response Status: ${response.status}`);
+}});    
+console.log(`📊 OpenAI Response Status: ${response.status}`);
     
     if (!response.ok) {
       console.error('❌ OpenAI API Error:', data);
