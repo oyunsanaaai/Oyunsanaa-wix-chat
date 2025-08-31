@@ -33,7 +33,7 @@ const resolvedModel = MAP.get(model) || 'gpt-4o';
     history: hist
   })
 });
-5
+
     const data = await r.json();
     if (!r.ok) {
       console.error('[oy-chat] OpenAI error:', r.status, data);
