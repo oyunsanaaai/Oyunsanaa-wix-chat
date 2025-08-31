@@ -1,9 +1,10 @@
-// /api/oy-chat.js
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
-  }
-
+// oy.js - эхэнд ЗӨВХӨН энийг бич:
+(()=> {
+  if (window.__OY_BOOTED__) return; 
+  window.__OY_BOOTED__ = true;
+  
+  // бусад код...
+})();
   try {
     const { model = 'gpt-4o-mini', msg = '', chatSlug = '', history = [] } = req.body || {};
     
