@@ -2,9 +2,13 @@
   if (window.__OY_BOOTED__) return; window.__OY_BOOTED__ = true;
   const $ = (s, r=document) => r.querySelector(s);
 
+  // 🔗 API серверийн үндсэн URL
+  const OY_API_BASE = 'https://chat.oyunsanaa.com';
+
   /* ===== Elements ===== */
   const el = {
     overlay: $('#oyOverlay'), modal: $('#oyModal'),
+    ...
     drawer: $('#oyDrawer'), menu: $('.oy-menu'),
     menuList: $('#menuList'),
     itemGuides: $('#itemGuides'), guidesWrap: $('#guidesWrap'),
