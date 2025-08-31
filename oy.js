@@ -37,7 +37,7 @@
 
     console.log(`📚 История: ${processedHistory.length} мессеж`);
 
- // API дуудлага
+// API дуудлага
 const response = await fetch('/api/oy-chat', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
@@ -47,8 +47,7 @@ const response = await fetch('/api/oy-chat', {
     chatSlug: currentChat,
     history: chatHistory
   })
-});
-    console.log(`📊 OpenAI Response Status: ${response.status}`);
+});    console.log(`📊 OpenAI Response Status: ${response.status}`);
     
     if (!response.ok) {
       console.error('❌ OpenAI API Error:', data);
