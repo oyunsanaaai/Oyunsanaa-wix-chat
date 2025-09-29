@@ -133,20 +133,24 @@
   }
 
   // ==== SEND ====
-  async function send () {
-    const t = (el.input?.value || '').trim();
-    if (!t) { meta('Жишээ: "Сайн байна уу?"'); return; }
-    if (!state.current) { bubble('Эхлээд Сэтгэлийн хөтөчөөс чат сонгоорой. 🌿','bot'); el.input.value=''; return; }
+ // chatbii.js дотор
+async function sendMessage(t) {
+  const hist = JSON.parse(localStorage.getItem("msgKey") || "[]");
 
-    bubble(esc(t), 'user');
-    pushMsg(state.current, 'user', esc(t));
-    el.input.value = '';
-    el.send.disabled = true;
+  const r = await fetch('/api/oyunsanaa', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      model: 'gpt-4o-mini',
+      msg: t,
+      history: hist
+    })
+  });
 
-    let hist = [];
-    try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
+  const data = await r.json();
+  console.log(data.reply); // UI дээр харуулах
+}
 
-    try {
 const r = await fetch('/api/oyunsanaa', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
