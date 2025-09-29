@@ -147,19 +147,16 @@
     try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
     try {
-   const r = await fetch('/api/oyunsanaa', {
+const r = await fetch('/api/oyunsanaa', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({ model: 'gpt-4o-mini', msg: t, chatSlug: state.current || '', history: hist })
-});
-
+  body: JSON.stringify({
     model: el.modelSelect?.value || 'gpt-4o-mini',
     msg: t,
     chatSlug: state.current || '',
     history: hist,
   }),
 });
- 
       const { reply, error } = await r.json();
       if (error) throw new Error(error);
 
