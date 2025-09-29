@@ -147,10 +147,12 @@
     try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
     try {
-    const r = await fetch('https://api-hugjuulelt-bice.vercel.app/api/oyunsanaa', {
+   const r = await fetch('/api/oyunsanaa', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
-  body: JSON.stringify({
+  body: JSON.stringify({ model: 'gpt-4o-mini', msg: t, chatSlug: state.current || '', history: hist })
+});
+
     model: el.modelSelect?.value || 'gpt-4o-mini',
     msg: t,
     chatSlug: state.current || '',
