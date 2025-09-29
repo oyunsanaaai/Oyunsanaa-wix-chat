@@ -147,7 +147,7 @@
     try { hist = JSON.parse(localStorage.getItem(msgKey(state.current)) || '[]'); } catch(_) {}
 
     try {
-    const r = await fetch('/api/oyunsanaa', {
+    const r = await fetch('https://api-hugjuulelt-bice.vercel.app/api/oyunsanaa', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
