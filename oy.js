@@ -146,21 +146,17 @@ async function sendMessage(t) {
       history: hist
     })
   });
-
-  const data = await r.json();
-  console.log(data.reply); // UI дээр харуулах
-}
-
-const r = await fetch('/api/oyunsanaa', {
+ const r = await fetch('https://api-hugjuulelt-bice.vercel.app/api/oyunsanaa', {
   method: 'POST',
   headers: { 'Content-Type': 'application/json' },
   body: JSON.stringify({
-    model: el.modelSelect?.value || 'gpt-4o-mini',
+    model: 'gpt-4o-mini',
     msg: t,
     chatSlug: state.current || '',
     history: hist,
   }),
 });
+
       const { reply, error } = await r.json();
       if (error) throw new Error(error);
 
